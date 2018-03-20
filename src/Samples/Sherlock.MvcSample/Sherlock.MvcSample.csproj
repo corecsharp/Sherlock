@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Sherlock.MvcSample</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Data.Dapper\Sherlock.Framework.Data.Dapper.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web\Sherlock.Framework.Web.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework\Sherlock.Framework.csproj" />
+    <ProjectReference Include="..\Sherlock.MvcSample.ApiModule\Sherlock.MvcSample.ApiModule.csproj" />
   </ItemGroup>
 
 </Project>

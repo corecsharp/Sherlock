@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{2F4E1E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sherlock.MvcSample", "src\Samples\Sherlock.MvcSample\Sherlock.MvcSample.csproj", "{F29AEFD9-82D3-435E-82A3-35FB32D4E755}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherlock.MvcSample.ApiModule", "src\Samples\Sherlock.MvcSample.ApiModule\Sherlock.MvcSample.ApiModule.csproj", "{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{F29AEFD9-82D3-435E-82A3-35FB32D4E755}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F29AEFD9-82D3-435E-82A3-35FB32D4E755}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F29AEFD9-82D3-435E-82A3-35FB32D4E755}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{98391F4C-6391-4508-AEA8-0ACAFD6963D9} = {74406637-F4F0-4FA2-AB39-A1A9D0C3B160}
 		{8ACA9748-701B-4BF4-8C31-BC5C7FE7EA60} = {74406637-F4F0-4FA2-AB39-A1A9D0C3B160}
 		{F29AEFD9-82D3-435E-82A3-35FB32D4E755} = {2F4E1E4F-E1C8-4DD5-91A0-DFFB07D846B6}
+		{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2} = {2F4E1E4F-E1C8-4DD5-91A0-DFFB07D846B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CB80B000-78F7-48C3-9F8E-CCE1087333A6}

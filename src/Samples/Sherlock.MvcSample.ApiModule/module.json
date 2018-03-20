@@ -1,0 +1,10 @@
+﻿{
+  "$schema": "..\\..\\..\\..\\schemas\\module-schema.json",
+  "author": "Allen",
+  "name": "api",
+  "description": "API测试模块",
+  "includeUserInterface": true,
+  "version": "1.0",
+  "category": "Sample"
+   
+}

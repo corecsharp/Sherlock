@@ -19,7 +19,7 @@ namespace Sherlock.MvcSample
               .SetBasePath(env.ContentRootPath)
               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-#if !DEBUG
+#if !DEBUG 
              .AddConfigurationCenter(env.ContentRootPath)
 #endif
           //TODO 注册中心连不上的时候要警告 

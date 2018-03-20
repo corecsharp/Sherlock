@@ -1,14 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Sherlock.Framework.Environment;
+using Sherlock.Framework.Web.Mvc;
+using Sherlock.MvcSample.Service;
 
 namespace Sherlock.MvcSample.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class ValuesController : SherlockApiController
     {
+        private Lazy<INewsService> _msgServiceLazy = null;
+
+        public ValuesController()
+        {
+
+            _msgServiceLazy = new Lazy<INewsService>(() => WorkContext.Resolve<INewsService>());
+
+
+        }
+
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
@@ -40,5 +52,14 @@ namespace Sherlock.MvcSample.Controllers
         public void Delete(int id)
         {
         }
+
+        [HttpGet("Test")]
+        public object Test()
+        {
+            var url = "https://news.bitcoinworld.com/a/4242";
+            var res = _msgServiceLazy.Value.IsExistsByNewsUrlAsync(url);
+            return res;
+        }
+
     }
 }
