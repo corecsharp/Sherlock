@@ -5,7 +5,6 @@
   "description": "API测试模块",
   "includeUserInterface": true,
   "version": "1.0",
-  "category": "Sample",
-  "rootNamespace": "api"
+  "category": "Sample"
 
 }

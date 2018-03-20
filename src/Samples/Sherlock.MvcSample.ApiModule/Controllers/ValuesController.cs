@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Sherlock.Framework.Environment;
 using Sherlock.Framework.Web.Mvc;
@@ -54,10 +55,10 @@ namespace Sherlock.MvcSample.ApiModule.Controllers
         }
 
         [HttpGet("Test")]
-        public object Test()
+        public async Task<object> TestAsync()
         {
             var url = "https://news.bitcoinworld.com/a/4242";
-            var res = _msgServiceLazy.Value.IsExistsByNewsUrlAsync(url);
+            var res =await _msgServiceLazy.Value.IsExistsByNewsUrlAsync(url);
             return res;
         }
 

@@ -165,13 +165,13 @@ namespace Sherlock
                 info.AppendLine((new Tuple<int, int, int, int, String>[] { table }).ToStringTable(new String[] { "modules", "controllers", "dependencies", "describers", "moduleList" },
                     t => t.Item1, t => t.Item2, t => t.Item3, t => t.Item4, t => t.Item5));
                 info.AppendLine("   ");
-                info.Append(context.Blueprint.Dependencies.GroupBy(d => d.Feature.Descriptor.ModuleName, d => (ShellBlueprintDependencyItem)d).ToStringTable(
-                    new string[] { "module", "dependencies", "internfaces", "lifetime" },
-                    f => f.Key,
-                    d => d.SelectMany(t => CreateArray(t.Type.Name, t.Interfaces.Count)).ToArrayString(System.Environment.NewLine),
-                    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item1.Name).ToArrayString(System.Environment.NewLine),
-                    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item2.ToString().ToLower()).ToArrayString(System.Environment.NewLine)));
-                info.AppendLine("   ");
+                //info.Append(context.Blueprint.Dependencies.GroupBy(d => d.Feature.Descriptor.ModuleName, d => (ShellBlueprintDependencyItem)d).ToStringTable(
+                //    new string[] { "module", "dependencies", "internfaces", "lifetime" },
+                //    f => f.Key,
+                //    d => d.SelectMany(t => CreateArray(t.Type.Name, t.Interfaces.Count)).ToArrayString(System.Environment.NewLine),
+                //    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item1.Name).ToArrayString(System.Environment.NewLine),
+                //    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item2.ToString().ToLower()).ToArrayString(System.Environment.NewLine)));
+                //info.AppendLine("   ");
 
                 shellLogger.WriteInformation(info.ToString());
             }

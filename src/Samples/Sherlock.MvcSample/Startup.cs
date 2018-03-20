@@ -45,7 +45,7 @@ namespace Sherlock.MvcSample
                         {
                             settings.MvcFeatures = Sherlock.Framework.Web.MvcFeatures.Api;
                             settings.JsonSerializeLongAsString = true;
-                            settings.JsonCapitalizationStyle = Sherlock.Framework.Web.CapitalizationStyle.CamelCase;
+                            settings.JsonCapitalizationStyle = Sherlock.Framework.Web.CapitalizationStyle.PascalCase;
                         });
 
                     });
