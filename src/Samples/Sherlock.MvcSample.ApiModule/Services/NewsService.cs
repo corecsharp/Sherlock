@@ -1,11 +1,11 @@
 ﻿using Sherlock.Framework.Data;
-using Sherlock.MvcSample.Model;
+using Sherlock.MvcSample.ApiModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sherlock.MvcSample.Service
+namespace Sherlock.MvcSample.ApiModule.Services
 {
     public class NewsService : INewsService
     {

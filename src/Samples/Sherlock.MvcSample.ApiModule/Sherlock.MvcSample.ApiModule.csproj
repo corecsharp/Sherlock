@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Data.Dapper\Sherlock.Framework.Data.Dapper.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web\Sherlock.Framework.Web.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework\Sherlock.Framework.csproj" />

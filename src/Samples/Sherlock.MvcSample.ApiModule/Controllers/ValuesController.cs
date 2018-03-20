@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Sherlock.Framework.Environment;
 using Sherlock.Framework.Web.Mvc;
-using Sherlock.MvcSample.Service;
+using Sherlock.MvcSample.ApiModule.Services;
 
-namespace Sherlock.MvcSample.Controllers
+namespace Sherlock.MvcSample.ApiModule.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : SherlockApiController

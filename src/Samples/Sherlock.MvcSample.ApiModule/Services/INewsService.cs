@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sherlock.MvcSample.Service
+namespace Sherlock.MvcSample.ApiModule.Services
 {
     public interface INewsService : IDependency
     {
