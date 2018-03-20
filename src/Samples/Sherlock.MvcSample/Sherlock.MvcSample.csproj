@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Framework\Sherlock.Framework.Data.Dapper\Sherlock.Framework.Data.Dapper.csproj" />
+    <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web\Sherlock.Framework.Web.csproj" />
+    <ProjectReference Include="..\..\Framework\Sherlock.Framework\Sherlock.Framework.csproj" />
+  </ItemGroup>
+
+</Project>

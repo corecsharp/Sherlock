@@ -108,17 +108,17 @@ namespace Sherlock.Framework.Caching
         private String _defaultRegion = null;
 
         public RedisCacheManager(
-            IOptions<SherlockOptions> schubertOptions,
+            IOptions<SherlockOptions> sherlockOptions,
             IOptions<SherlockRedisOptions> redisOptions,
             IEnumerable<IRedisCacheSerializer> serializers = null,
             ILoggerFactory loggerFactory = null)
         {
-            Guard.ArgumentNotNull(schubertOptions, nameof(schubertOptions));
+            Guard.ArgumentNotNull(sherlockOptions, nameof(sherlockOptions));
             Guard.ArgumentNotNull(redisOptions, nameof(redisOptions));
             _connection = new Lazy<ConnectionMultiplexer>(this.CreateConnection, true);
             _logger = loggerFactory?.CreateLogger<RedisCacheManager>() ?? (ILogger)NullLogger.Instance;
             _options = redisOptions.Value;
-            _defaultRegion = $"{schubertOptions.Value.Group}{RegionSpliterChar}{ schubertOptions.Value.AppSystemName}";
+            _defaultRegion = $"{sherlockOptions.Value.Group}{RegionSpliterChar}{ sherlockOptions.Value.AppSystemName}";
             _redisCacheSerializers = serializers?.ToDictionary(s => s.Name, s => s, StringComparer.OrdinalIgnoreCase);
             if (_redisCacheSerializers.IsNullOrEmpty())
             {
