@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sherlock.Framework.Modularity.Tools.Vs2017": {
+      "commandName": "Project",
+      "commandLineArgs": "--c C:\\gznbGit\\Sherlock\\src\\Samples\\Sherlock.MvcSample\\Sherlock.MvcSample.csproj --dest D:\\mmm"
+    }
+  }
+}

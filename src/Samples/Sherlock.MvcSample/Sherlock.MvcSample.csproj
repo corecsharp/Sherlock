@@ -18,7 +18,13 @@
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Data.Dapper\Sherlock.Framework.Data.Dapper.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web\Sherlock.Framework.Web.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework\Sherlock.Framework.csproj" />
+    <ProjectReference Include="..\..\Tools\Sherlock.Framework.Modularity.Tools.Vs2017\Sherlock.Framework.Modularity.Tools.Vs2017.csproj" />
     <ProjectReference Include="..\Sherlock.MvcSample.ApiModule\Sherlock.MvcSample.ApiModule.csproj" />
   </ItemGroup>
+
+  <Target Name="Modularity" AfterTargets="AfterPublish">
+    <Message Text="publishUrl=$(publishUrl)"></Message>
+    <Exec Command="dotnet modularity --config $(MSBuildProjectFullPath) --dest $(publishUrl)"></Exec>
+  </Target>
 
 </Project>
