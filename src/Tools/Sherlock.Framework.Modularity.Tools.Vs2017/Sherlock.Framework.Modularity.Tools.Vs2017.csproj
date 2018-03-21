@@ -7,11 +7,11 @@
     <TargetFrameworks>netcoreapp1.1;netcoreapp1.0;net461</TargetFrameworks>
     <PackageType>DotnetCliTool</PackageType>
     <VersionPrefix>2.1.2</VersionPrefix>
-    <PackageId>Schubert.Framework.Modularity.Tools.Vs2017</PackageId>
-    <Authors>GZNB.InfrastructureTeam</Authors>
-    <Company>GZNB.</Company>
-    <Product>Schubert</Product>
-    <Description>VS2017 Schubert Framework Modularity Tool</Description>
+    <PackageId>Sherlock.Framework.Modularity.Tools.Vs2017</PackageId>
+    <Authors>CoreCSharp Team;Allen.Feng</Authors>
+    <Company></Company>
+    <Product>Sherlock</Product>
+    <Description>VS2017 Sherlock Framework Modularity Tool</Description>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

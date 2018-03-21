@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{1D662328
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherlock.Framework.Modularity.Tools.Vs2017", "src\Tools\Sherlock.Framework.Modularity.Tools.Vs2017\Sherlock.Framework.Modularity.Tools.Vs2017.csproj", "{F26884D4-A06E-4CEB-8279-F5EA52055446}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherlock.Framework.Web.FluentValidation", "src\Framework\Sherlock.Framework.Web.FluentValidation\Sherlock.Framework.Web.FluentValidation.csproj", "{F96C22CB-F8D7-4C62-926C-842F28AF2EF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{F26884D4-A06E-4CEB-8279-F5EA52055446}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F26884D4-A06E-4CEB-8279-F5EA52055446}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F26884D4-A06E-4CEB-8279-F5EA52055446}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F96C22CB-F8D7-4C62-926C-842F28AF2EF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F96C22CB-F8D7-4C62-926C-842F28AF2EF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F96C22CB-F8D7-4C62-926C-842F28AF2EF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F96C22CB-F8D7-4C62-926C-842F28AF2EF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{F29AEFD9-82D3-435E-82A3-35FB32D4E755} = {2F4E1E4F-E1C8-4DD5-91A0-DFFB07D846B6}
 		{58E783E9-0B31-4F86-AF8F-EA0D5158BDA2} = {2F4E1E4F-E1C8-4DD5-91A0-DFFB07D846B6}
 		{F26884D4-A06E-4CEB-8279-F5EA52055446} = {1D662328-E846-43CA-9DAC-3C9C8B232CBC}
+		{F96C22CB-F8D7-4C62-926C-842F28AF2EF1} = {74406637-F4F0-4FA2-AB39-A1A9D0C3B160}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CB80B000-78F7-48C3-9F8E-CCE1087333A6}

@@ -61,8 +61,8 @@ if %last% == 1 (
 if %last% == 2 (
 	echo 开始打包工具
 	set last=3
-	set d=%~dp0src\Tooling
-	set f=Schubert.Framework.Modularity.Tools.Vs2017.csproj
+	set d=%~dp0src\Tools
+	set f=Sherlock.Framework.Modularity.Tools.Vs2017.csproj
 	goto PACK
 )
 
