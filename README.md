@@ -1,5 +1,5 @@
 # Sherlock
-### Sherlock来自于Schubert（作者肖平：https://github.com/endink/），简化Schubert功能，同时自身更新，为.NET Core 开源贡献绵薄之力
+### Sherlock来自于Schubert（肖平：https://github.com/endink/ ），简化Schubert功能，同时自身更新，为.NET Core 开源贡献绵薄之力
 
 ## C# 统一开发框架
 
