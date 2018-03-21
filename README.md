@@ -1,5 +1,5 @@
 # Sherlock
-### Sherlock来自于Sherlock（作者肖平），简化Sherlock功能，同时自身更新，为.NET Core 开源贡献绵薄之力
+### Sherlock来自于Schubert（作者肖平），简化Schubert功能，同时自身更新，为.NET Core 开源贡献绵薄之力
 
 ## C# 统一开发框架
 
@@ -8,7 +8,7 @@
 配置、日志、领域事件、缓存接口、Social OAuth 2.0（QQ、微博）、Ioc、Respository for Dapper、FluentValidator for Asp.Net Core、Asp.Net Identity with Dapper
 
 
->nuget地址： https://www.nuget.org/packages?q=Sherlock.Framework
+>nuget地址： https://api.nuget.org/v3/index.json
 
 ---
 
@@ -28,7 +28,7 @@ Dapper  |      Y      |    N               |    N
 
 # 开发文档
 
->http://10.66.2.13/InfrastructureTeam/Docs/blob/master/Sherlock/ReadMe.md
+>https://github.com/corecsharp/Sherlock/blob/master/README.md
 
 **配置文件架构（schema）**
 
@@ -40,19 +40,16 @@ Sherlock 使用 asp.net core 的标准配置模型，你可以通过任意格式
 
 >`v2.0.*`
 
->catalog schema : http://schemas.gznb.com/Sherlock/v2.0/catalog.json
+>catalog schema : https://github.com/corecsharp/Sherlock/blob/master/schemas/catalog.json
 
->appsettings schema : http://schemas.gznb.com/Sherlock/v2.0/module.json   
+>appsettings schema : https://github.com/corecsharp/Sherlock/blob/master/schemas/appsettings.json   
 
->module schema : http://schemas.gznb.com/Sherlock/v2.0/appsettings.json
+>module schema : https://github.com/corecsharp/Sherlock/blob/master/schemas/module.json
 
 
 **Web项目打包发布使用说明** 
 > VS2017:
-[点击这里](http://10.66.2.13/InfrastructureTeam/Sherlock/blob/master/src/Tooling/dotnet-modularity/ReadMe.md)
-
-> VS2015（旧版）:
-[点击这里](http://10.66.2.13/InfrastructureTeam/Sherlock/blob/master/src/Tooling/Sherlock.Framework.Modularity.Tools/ReadMe.md)
+[点击这里](https://github.com/corecsharp/Sherlock/blob/master/src/Tools/Sherlock.Framework.Modularity.Tools.Vs2017/ReadMe.md)
 
 # QuickStart
 
@@ -105,7 +102,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
 ```javascript
 
 {
-  "$schema": "http://schemas.gznb.com/Sherlock/v2.0/appsettings.json",
+  "$schema": "https://github.com/corecsharp/Sherlock/blob/master/schemas/appsettings.json",
   "Sherlock": {
     "Group": "InfraTeam",
     "AppSystemName": "SherlockSample",

@@ -1,5 +1,4 @@
 ﻿{
-  "id": "http://schemas.gznb.com/schubert/moduleschema",
   "$schema": "http://json-schema.org/draft-04/schema",
   "title": "模块清单文件架构定义",
 
