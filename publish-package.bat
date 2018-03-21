@@ -1,5 +1,5 @@
 SET key=oy2jhwrkgo4db4u4bpealoeiejyqfifublf2gydfxtidma 
-SET version=3.0.0-beta2
+SET version=3.0.0
 SET source=https://api.nuget.org/v3/index.json
 
 

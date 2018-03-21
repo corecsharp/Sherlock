@@ -2,7 +2,7 @@
   <PropertyGroup>
     <VersionPrefix>3.0</VersionPrefix>
     <ExperimentalProjectVersionPrefix>0.1.0</ExperimentalProjectVersionPrefix>
-    <VersionSuffix>beta2</VersionSuffix>
+    <VersionSuffix>rtm</VersionSuffix>
     <PackageVersion Condition="'$(VersionSuffix)' == 'rtm' ">$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(VersionSuffix)' != 'rtm' ">$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
     <PackageProjectUrl>http://endink.github.com</PackageProjectUrl>
