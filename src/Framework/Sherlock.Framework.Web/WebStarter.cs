@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Sherlock.Framework.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Sherlock.Framework.Web.DependencyInjection;
 
 namespace Sherlock.Framework.Web
 {

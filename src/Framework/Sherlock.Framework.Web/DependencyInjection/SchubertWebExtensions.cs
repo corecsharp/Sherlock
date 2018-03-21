@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +27,7 @@ namespace Sherlock
     public static class SherlockWebExtensions
     {
         public static SherlockWebBuilder _webBuilder = null;
+        private static Guid _module = Guid.NewGuid();
 
         /// <summary>
         /// 启用Sherlock 框架的 Web 特性。
@@ -33,31 +37,50 @@ namespace Sherlock
         /// <returns></returns>
         public static SherlockServicesBuilder AddWebFeature(this SherlockServicesBuilder services, Action<SherlockWebBuilder> setup = null)
         {
-            IConfiguration configuration = services.Configuration.GetSection("Sherlock:Web") as IConfiguration ?? new ConfigurationBuilder().Build();
+            SherlockWebOptions options = new SherlockWebOptions();
+            bool firstInvoke = true;
+            if ((firstInvoke = services.AddedModules.Add(_module)))
+            {
+                IConfiguration configuration = services.Configuration.GetSection("Sherlock:Web") as IConfiguration ?? new ConfigurationBuilder().Build();
 
-            services.ServiceCollection.Configure<SherlockWebOptions>(configuration);
+                services.ServiceCollection.Configure<SherlockWebOptions>(configuration);
+
+                var SherlockWebSetup = new SherlockWebOptionsSetup(configuration);
+                SherlockWebSetup.Configure(options);
+            }
 
             _webBuilder = new SherlockWebBuilder(services);
             setup?.Invoke(_webBuilder);
 
-            SherlockWebOptions options = new SherlockWebOptions();
-
-            var schubertWebSetup = new SherlockWebOptionsSetup(configuration);
-            schubertWebSetup.Configure(options);
 
             if (_webBuilder.FeatureSetup != null)
             {
                 services.ServiceCollection.Configure(setup);
             }
             _webBuilder.FeatureSetup?.Invoke(options);
-
-
             services.ServiceCollection.AddDataProtection();
-
+            
             services.ServiceCollection.AddLocalization();
-            services.ServiceCollection.Replace(ServiceDescriptor.Scoped<IStringLocalizerFactory, SherlockStringLocalizerFactory>());
-            services.ServiceCollection.TryAddSingleton<IMemoryCache>(s => LocalCache.InnerCache);
+            services.ServiceCollection.Replace(ServiceDescriptor.Singleton<IStringLocalizerFactory, SherlockStringLocalizerFactory>());
+            services.ServiceCollection.TryAddSingleton<IMemoryCache>(s=> LocalCache.InnerCache);
             services.AddCacheForAspNet();
+
+            var cookieSetup = _webBuilder.CookieSetup;
+            services.ServiceCollection.ConfigureApplicationCookie(o =>
+            {
+                o.LoginPath = "/Login";
+                o.LogoutPath = "/LogOff";
+                o.Cookie.HttpOnly = true;
+                o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                cookieSetup?.Invoke(o);
+            });
+
+            var authenticationBuilder = services.ServiceCollection.AddAuthentication();
+
+            if (options.UseCookieAuth)
+            {
+                authenticationBuilder.AddCookie();
+            }
             if (options.UseSession)
             {
                 services.ServiceCollection.AddSession(sop =>
@@ -65,33 +88,33 @@ namespace Sherlock
                     sop.IdleTimeout = TimeSpan.FromMinutes(options.SessionTimeoutMinutes);
                 });
             }
-
-            AddMvc(services, _webBuilder, options);
-
-            services.ServiceCollection.AddSmart(SherlockWebServices.GetServices(options));
+            
+            services.ServiceCollection.AddSmart(SherlockWebServices.GetServices(options, firstInvoke));
 
             foreach (var s in _webBuilder.WebStarters)
             {
                 s.ConfigureServices(services, options);
             }
 
+            AddMvc(services, _webBuilder, options);
+
             return services;
         }
+        
 
-
-        private static IContractResolver GetContractResolver(CapitalizationStyle style, bool longAsString)
+        private static IContractResolver GetContractResolver(JsonCaseStyle style, JsonResolverSettings settings)
         {
             switch (style)
             {
-                case CapitalizationStyle.CamelCase:
-
-                    return new ExtendedCamelCaseContractResolver(longAsString);
-                case CapitalizationStyle.PascalCase:
-                default:
-                    return new ExtendedContractResolver(longAsString);
+                case JsonCaseStyle.CamelCase:
+                   
+                    return new ExtendedCamelCaseContractResolver(settings);
+                case JsonCaseStyle.PascalCase:
+                    default:
+                    return new ExtendedContractResolver(settings);
             }
         }
-
+        
 
         private static void AddMvc(SherlockServicesBuilder services, SherlockWebBuilder featureBuilder, SherlockWebOptions options)
         {
@@ -100,13 +123,13 @@ namespace Sherlock
                 case MvcFeatures.Full:
                     var mvcBuilder = services.ServiceCollection.AddMvc();
                     featureBuilder.MvcSetup?.Invoke(mvcBuilder);
-                    mvcBuilder.AddJsonOptions(json => json.SerializerSettings.ContractResolver = GetContractResolver(options.JsonCapitalizationStyle, options.JsonSerializeLongAsString))
+                    mvcBuilder.AddJsonOptions(json=>json.SerializerSettings.ContractResolver = GetContractResolver(options.JsonCaseStyle, options.JsonResolver))
                         .AddRazorOptions(rveo =>
                         {
                             rveo.FileProviders.Insert(0, new ModuleFileProvider(rveo.FileProviders.FirstOrDefault()));
                             rveo.ViewLocationExpanders.Insert(0, new ModuleViewLocationExpander());
                         });
-                    services.ServiceCollection.AddAntiforgery();
+                    //services.ServiceCollection.AddAntiforgery();
                     break;
                 case MvcFeatures.Core:
                     var coreBuilder = services.ServiceCollection.AddMvcCore();
@@ -118,7 +141,7 @@ namespace Sherlock
                     apiBuilder.AddApiExplorer()
                         .AddAuthorization()
                         .AddFormatterMappings()
-                        .AddJsonFormatters(settings => settings.ContractResolver = GetContractResolver(options.JsonCapitalizationStyle, options.JsonSerializeLongAsString))
+                        .AddJsonFormatters(settings=>settings.ContractResolver = GetContractResolver(options.JsonCaseStyle, options.JsonResolver))
                         .AddDataAnnotations()
                         .AddCors()
                         .AddWebApiConventions();
@@ -133,10 +156,8 @@ namespace Sherlock
         /// 启动基于 Sherlock 引擎的 Web 应用程序。
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="setupAuthentication"></param>
         /// <returns></returns>
-        public static IApplicationBuilder StartSherlockWebApplication(this IApplicationBuilder builder,
-            Action<AuthenticationBuilder> setupAuthentication = null)
+        public static IApplicationBuilder StartSherlockWebApplication(this IApplicationBuilder builder)
         {
             builder.ApplicationServices.StartSherlockEngine();
             //启动引擎，为我们动态注册服务，创建 Shell 上下文。
@@ -149,14 +170,14 @@ namespace Sherlock
                 }
 
                 var moduleManager = builder.ApplicationServices.GetRequiredService<IModuleManager>();
-
+                
                 builder.UseStaticFiles();
+                builder.UseAuthentication();
 
                 if (options.Value.UseSession)
                 {
                     builder.UseSession();
                 }
-                setupAuthentication?.Invoke(new AuthenticationBuilder(builder));
                 if (options.Value.MvcFeatures != MvcFeatures.None)
                 {
                     builder.UseMvc();

@@ -12,8 +12,8 @@ namespace Sherlock.Framework.FileSystem
         private int _tempTimeoutMinutes = 0;
         private string _directory = null;
 
-        public PhysicalTemporaryFileStorage(int tempTimeoutMinutes, IFilePathRouter router, IFileUrlProvider fileUrlProvider)
-            :base(TempScope, router, fileUrlProvider)
+        public PhysicalTemporaryFileStorage(int tempTimeoutMinutes, IFileRequestMapping fileMapping)
+            :base(TempScope,fileMapping)
         {
             _tempTimeoutMinutes = Math.Max(1, _tempTimeoutMinutes);
         }
@@ -21,7 +21,7 @@ namespace Sherlock.Framework.FileSystem
         public Task ClearAsync()
         {
             return Task.Run(() => {
-                _directory = this.Router.GetFilePath("/", TempScope);
+                _directory = this.Mapping.GetFilePath("/", TempScope);
                 if (Directory.Exists(_directory))
                 {
                     var files = Directory.EnumerateFiles(_directory, "*", SearchOption.AllDirectories);

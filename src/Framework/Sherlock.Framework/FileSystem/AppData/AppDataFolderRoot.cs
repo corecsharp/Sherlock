@@ -29,14 +29,7 @@ namespace Sherlock.Framework.FileSystem.AppData
         {
             get
             {
-                if (_environment.IsDevelopmentEnvironment || SherlockUtility.InVisualStudio())
-                {
-                    return Path.Combine(SherlockUtility.GetUserDirectory(), "App_Data", _appName);
-                }
-                else
-                {
                     return _pathProvider.MapApplicationPath(RootPath);
-                }
             }
         }
     }

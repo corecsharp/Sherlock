@@ -33,7 +33,7 @@ namespace Sherlock.Framework.Environment
         /// <summary>
         /// 获取应用程序版运行时框架。
         /// </summary>
-        FrameworkName RuntimeFramework { get; }
+        String RuntimeFramework { get; }
 
         /// <summary>
         /// 获取应用程序实例的 Id。

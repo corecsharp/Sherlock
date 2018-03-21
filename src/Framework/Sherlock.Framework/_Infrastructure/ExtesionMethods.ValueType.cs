@@ -212,7 +212,7 @@ namespace System
             return !n.IsOdd();
         }
 
-        private static readonly TimeZoneInfo BeiJingTimeZone = TimeZoneInfo.FindSystemTimeZoneById(SystemHelper.GetChinaTimeZoneIdByCurrentSys());
+        private static readonly TimeZoneInfo BeiJingTimeZone = TimeZoneHelper.GetTimeZoneInfo("Asia/Shanghai");
 
         /// <summary>
         /// 将北京时间转换为 UTC 时间。

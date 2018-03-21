@@ -7,10 +7,12 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using HttpRequestHeader = System.Net.Http.Headers.HttpRequestHeaders;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
 
 namespace Sherlock.Framework.Http
 {
@@ -76,12 +78,12 @@ namespace Sherlock.Framework.Http
             string path,
             String queryString = null,
             IRequestContent body = null,
-            IDictionary<string, string> headers = null,
+            Action<HttpRequestHeader> headersConfigure = null,
             TimeSpan? timeout = null,
             CancellationToken? token = null,
             IEnumerable<RestResponseErrorHandlingDelegate> errorHandlers = null)
         {
-            var response =  await this.MakeRequestAsync(method, path, queryString, body, headers, timeout, token, errorHandlers);
+            var response =  await this.MakeRequestAsync(method, path, queryString, body, headersConfigure, timeout, token, errorHandlers);
             return this.JsonSerializer.DeserializeObject<T>(response.Body);
         }
 
@@ -90,12 +92,12 @@ namespace Sherlock.Framework.Http
             string path,
             String queryString = null,
             IRequestContent body = null,
-            IDictionary<string, string> headers = null,
+            Action<HttpRequestHeader> headersConfigure = null,
             TimeSpan? timeout = null,
             CancellationToken? token = null,
             IEnumerable<RestResponseErrorHandlingDelegate> errorHandlers = null)
         {
-            var response = await this.MakeRequestCoreAsync(method, path, queryString, body, timeout, token, HttpCompletionOption.ResponseContentRead, headers).ConfigureAwait(false);
+            var response = await this.MakeRequestCoreAsync(method, path, queryString, body, timeout, token, HttpCompletionOption.ResponseContentRead, headersConfigure).ConfigureAwait(false);
             using (response)
             {
                 var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -111,12 +113,12 @@ namespace Sherlock.Framework.Http
             string path,
             String queryString = null,
             IRequestContent body = null,
-            IDictionary<string, string> headers = null,
+            Action<HttpRequestHeader> headersConfigure = null,
             TimeSpan? timeout = null,
             CancellationToken? token = null,
              IEnumerable<RestResponseErrorHandlingDelegate> errorHandlers = null)
         {
-            var response = await this.MakeRequestCoreAsync(method, path, queryString, body, timeout, token, HttpCompletionOption.ResponseHeadersRead, headers).ConfigureAwait(false);
+            var response = await this.MakeRequestCoreAsync(method, path, queryString, body, timeout, token, HttpCompletionOption.ResponseHeadersRead, headersConfigure).ConfigureAwait(false);
 
             HandleIfErrorResponse(response.StatusCode, null, errorHandlers);
 
@@ -143,12 +145,12 @@ namespace Sherlock.Framework.Http
            string path,
            String queryString = null,
            IRequestContent body = null,
-           IDictionary<string, string> headers = null,
+           Action<HttpRequestHeader> headersConfigure = null,
            TimeSpan? timeout = null,
            CancellationToken? cancellationToken = null,
            IEnumerable<RestResponseErrorHandlingDelegate> errorHandlers = null)
         {
-            var response = await MakeRequestCoreAsync(method, path, queryString, body, timeout, cancellationToken, HttpCompletionOption.ResponseHeadersRead, headers).ConfigureAwait(false);
+            var response = await MakeRequestCoreAsync(method, path, queryString, body, timeout, cancellationToken, HttpCompletionOption.ResponseHeadersRead, headersConfigure).ConfigureAwait(false);
 
             HandleIfErrorResponse(response.StatusCode, null, errorHandlers);
 
@@ -162,7 +164,7 @@ namespace Sherlock.Framework.Http
         }
 
 
-        private Task<HttpResponseMessage> MakeRequestCoreAsync(
+        private async Task<HttpResponseMessage> MakeRequestCoreAsync(
            HttpMethod method,
            string path,
            String queryString = null,
@@ -170,9 +172,9 @@ namespace Sherlock.Framework.Http
            TimeSpan? timeout = null,
            CancellationToken? cancellationToken = null,
            HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead,
-           IDictionary<string, string> headers = null)
+           Action<HttpRequestHeader> headersConfigure = null)
         {
-            var request = PrepareRequest(method, path, queryString, headers, data);
+            var request = PrepareRequest(method, path, queryString, headersConfigure, data);
 
             CancellationToken token;
             if (timeout != InfiniteTimeout)
@@ -183,31 +185,29 @@ namespace Sherlock.Framework.Http
                 token = timeoutTokenSource.Token;
             }
 
-            return _client.SendAsync(request, completionOption, token).ContinueWith(t=>
+            try
             {
-                try
+                var result = await _client.SendAsync(request, completionOption, token);
+                return result;
+            }
+            catch (OperationCanceledException cex)
+            {
+                String body = null;
+                if (data != null)
                 {
-                    return t.GetAwaiter().GetResult();
+                    body = data.GetContent()?.ReadAsStringAsync()?.GetAwaiter().GetResult();
                 }
-                catch (OperationCanceledException cex)
+                throw new SherlockRestTimeoutException($@"在 {(timeout ?? this.Configuration.Timeout).TotalSeconds.ToString()} 秒内没有收到服务端的 HTTP 响应（uri: {request.RequestUri?.ToString().IfNullOrWhiteSpace("null")}, data:{body.IfNullOrWhiteSpace("null")}）调用的响应。", cex);
+            }
+            catch (Exception ex)
+            {
+                String body = null;
+                if (data != null)
                 {
-                    String body = null;
-                    if (data != null)
-                    {
-                        body = data.GetContent()?.ReadAsStringAsync()?.GetAwaiter().GetResult();
-                    }
-                    throw new SherlockRestTimeoutException($@"在 {(timeout ?? this.Configuration.Timeout).TotalSeconds.ToString()} 秒内没有收到对 docker api （uri: {request.RequestUri?.ToString().IfNullOrWhiteSpace("null")}, data:{body.IfNullOrWhiteSpace("null")}）调用的响应。", cex);
+                    body = data.GetContent()?.ReadAsStringAsync()?.GetAwaiter().GetResult();
                 }
-                catch (Exception ex)
-                {
-                    String body = null;
-                    if (data != null)
-                    {
-                        body = data.GetContent()?.ReadAsStringAsync()?.GetAwaiter().GetResult();
-                    }
-                    throw new SherlockRestException(HttpStatusCode.BadRequest, $@"请求 docker api（uri: {request.RequestUri?.ToString().IfNullOrWhiteSpace("null")}, data:{body.IfNullOrWhiteSpace("null")}）发生错误。", ex);
-                }
-            });
+                throw new SherlockRestException(HttpStatusCode.BadRequest, $@"请求 docker api（uri: {request.RequestUri?.ToString().IfNullOrWhiteSpace("null")}, data:{body.IfNullOrWhiteSpace("null")}）发生错误。", ex);
+            }
         }
 
         private void HandleIfErrorResponse(HttpStatusCode statusCode, string responseBody, IEnumerable<RestResponseErrorHandlingDelegate> handlers)
@@ -228,7 +228,7 @@ namespace Sherlock.Framework.Http
             }
         }
 
-        protected HttpRequestMessage PrepareRequest(HttpMethod method, string path, String queryString, IDictionary<string, string> headers, IRequestContent data)
+        protected HttpRequestMessage PrepareRequest(HttpMethod method, string path, String queryString,Action<HttpRequestHeader> headerConfigure, IRequestContent data)
         {
             if (string.IsNullOrEmpty("path"))
             {
@@ -237,15 +237,9 @@ namespace Sherlock.Framework.Http
 
             var request = new HttpRequestMessage(method, RestUtility.BuildUri(this.EndpointBaseUri, this._requestedApiVersion, path, queryString));
 
-            request.Headers.Add("User-Agent", UserAgent);
+            request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
 
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            headerConfigure?.Invoke(request.Headers);
 
             if (data != null)
             {

@@ -53,7 +53,7 @@ namespace Sherlock.Framework.FileSystem.AppData
 
             if (isDirectory && Directory.Exists(destinationFileName))
             {
-                Logger.WriteWarning("Could not delete recipe execution folder {0} under \"App_Data\" folder", destinationFileName);
+                Logger.WriteWarning($"Could not delete recipe execution folder {destinationFileName} under \"App_Data\" folder");
                 return;
             }
             // If destination doesn't exist, we are good
@@ -89,7 +89,7 @@ namespace Sherlock.Framework.FileSystem.AppData
             catch (Exception e)
             {
                 e.ThrowIfNecessary();
-                throw new SherlockException(String.Format("Unable to make room for file \"{0}\" in \"App_Data\" folder", destinationFileName), e);
+                throw new SherlockException($"Unable to make room for file \"{destinationFileName}\" in \"App_Data\" folder", e);
             }
         }
 
@@ -157,7 +157,7 @@ namespace Sherlock.Framework.FileSystem.AppData
 
         public void DeleteFile(string path)
         {
-            Logger.WriteTrace("Deleting file \"{path}\" from \"App_Data\" folder");
+            Logger.WriteTrace($"Deleting file \"{path}\" from \"App_Data\" folder");
             MakeDestinationFileNameAvailable(CombineToPhysicalPath(path));
         }
 

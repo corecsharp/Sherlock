@@ -9,56 +9,77 @@ namespace Sherlock.Framework.Json
 {
     public class ExtendedCamelCaseContractResolver : CamelCasePropertyNamesContractResolver
     {
-        private bool longAsString = false;
+        private JsonResolverSettings _settings;
         /// <summary>
         /// 创建 <see cref="ExtendedCamelCaseContractResolver"/> 的新实例。
         /// </summary>
-        /// <param name="useLongAsString">是否将 long 序列化为 string 类型（javascript 无法使用 64 位整数）。</param>
-        public ExtendedCamelCaseContractResolver(bool useLongAsString = false) :base()
+        /// <param name="jsonResolverSettings">配置特殊的转换处理。</param>
+        public ExtendedCamelCaseContractResolver(JsonResolverSettings jsonResolverSettings) :base()
         {
-            this.longAsString = useLongAsString;
+            Guard.ArgumentNotNull(jsonResolverSettings, nameof(jsonResolverSettings));
+            this._settings = jsonResolverSettings;
         }
 
-        private static bool IsLongOrNullableLong(Type objectType)
+        private static bool IsLong(Type objectType)
         {
             return (objectType.Equals(typeof(long)) || objectType.Equals(typeof(long?)));
         }
 
-        protected override JsonPrimitiveContract CreatePrimitiveContract(Type objectType)
+        private static bool IsDateTime(Type objectType)
         {
-            if (IsLongOrNullableLong(objectType) && longAsString)
+            return (objectType.Equals(typeof(DateTime)) || objectType.Equals(typeof(DateTime?)) || objectType.Equals(typeof(DateTimeOffset)) || objectType.Equals(typeof(DateTimeOffset?)));
+        }
+
+        protected override JsonContract CreateContract(Type objectType)
+        {
+            if (IsLong(objectType) && _settings.LongToString.Enable)
             {
                 return new LongToStringContract(objectType);
             }
-            return base.CreatePrimitiveContract(objectType);
+            if (IsDateTime(objectType) && _settings.DateTimeToString.Enable)
+            {
+                return new DateTimeToStringContract(objectType, _settings.DateTimeToString.InputFormat, _settings.DateTimeToString.OutputFormat);
+            }
+            return base.CreateContract(objectType);
         }
 
     }
 
     public class ExtendedContractResolver : DefaultContractResolver
     {
-        private bool longAsString = false;
+        private JsonResolverSettings _settings;
         /// <summary>
-        /// 创建 <see cref="ExtendedContractResolver"/> 的新实例。
+        /// 创建 <see cref="ExtendedCamelCaseContractResolver"/> 的新实例。
         /// </summary>
-        /// <param name="useLongAsString">是否将 long 序列化为 string 类型（javascript 无法使用 64 位整数）。</param>
-        public ExtendedContractResolver(bool useLongAsString = false) :base()
+        /// <param name="jsonResolverSettings">配置特殊的转换处理。</param>
+        public ExtendedContractResolver(JsonResolverSettings jsonResolverSettings) : base()
         {
-            this.longAsString = useLongAsString;
+            Guard.ArgumentNotNull(jsonResolverSettings, nameof(jsonResolverSettings));
+            this._settings = jsonResolverSettings;
         }
 
-        private static bool IsLongOrNullableLong(Type objectType)
+        private static bool IsLong(Type objectType)
         {
             return (objectType.Equals(typeof(long)) || objectType.Equals(typeof(long?)));
         }
 
-        protected override JsonPrimitiveContract CreatePrimitiveContract(Type objectType)
+        private static bool IsDateTime(Type objectType)
         {
-            if (IsLongOrNullableLong(objectType) && longAsString)
+            return (objectType.Equals(typeof(DateTime)) || objectType.Equals(typeof(DateTime?)) || objectType.Equals(typeof(DateTimeOffset)) || objectType.Equals(typeof(DateTimeOffset?)));
+        }
+
+        protected override JsonContract CreateContract(Type objectType)
+        {
+            if (IsLong(objectType) && _settings.LongToString.Enable)
             {
                 return new LongToStringContract(objectType);
             }
-            return base.CreatePrimitiveContract(objectType);
+            if (IsDateTime(objectType) && _settings.DateTimeToString.Enable)
+            {
+                return new DateTimeToStringContract(objectType, _settings.DateTimeToString.InputFormat, _settings.DateTimeToString.OutputFormat);
+            }
+            return base.CreateContract(objectType);
         }
+
     }
 }

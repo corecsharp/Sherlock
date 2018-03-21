@@ -15,6 +15,8 @@ namespace Sherlock
 {
     public static class SherlockDapperExtensions
     {
+        private static Guid _module = Guid.NewGuid();
+
         /// <summary>
         /// 加入 Asp.Net Identity ，同时使用 Dapper 持久化存储。
         /// </summary>
@@ -22,13 +24,17 @@ namespace Sherlock
         /// <typeparam name="TRole">角色类型。</typeparam>
         /// <typeparam name="TIdentityService"><see cref="IIdentityService"/></typeparam>
         /// <param name="builder"></param>
+        /// <param name="configure"></param>
         /// <returns></returns>
-        public static SherlockWebBuilder AddIdentityWithDapperStores<TUser, TRole, TIdentityService>(this SherlockWebBuilder builder)
+        public static SherlockWebBuilder AddIdentityWithDapperStores<TUser, TRole, TIdentityService>(this SherlockWebBuilder builder, Action<IdentityOptions> configure = null)
             where TUser : class, IUser
             where TRole : class, IRole
             where TIdentityService : IIdentityService
         {
-            builder.AddStarter(new DapperIdentityStarter<TUser, TRole, TIdentityService>());
+            if (builder.AddedModules.Add(_module))
+            {
+                builder.AddStarter(new DapperIdentityStarter<TUser, TRole, TIdentityService>(configure));
+            }
             return builder;
         }
 

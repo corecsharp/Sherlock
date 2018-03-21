@@ -14,26 +14,28 @@ namespace Sherlock.Framework.DependencyInjection
 {
     public static class SherlockWebServices
     {
-        public static IEnumerable<SmartServiceDescriptor> GetServices(SherlockWebOptions options)
+        public static IEnumerable<SmartServiceDescriptor> GetServices(SherlockWebOptions options, bool append = true)
         {
             Guard.ArgumentNotNull(options, nameof(options));
 
-            yield return ServiceDescriber.Transient<IModuleFinder, PackageFinder>(SmartOptions.Append);
+            if (append)
+            {
+                yield return ServiceDescriber.Transient<IModuleFinder, PackageFinder>(SmartOptions.Append);
+                yield return ServiceDescriber.Singleton<IWorkContextProvider, HttpWorkContextProvider>(SmartOptions.Append);
+                yield return ServiceDescriber.Transient<IShellBlueprintItemExporter, ControllerExporter>(SmartOptions.Append);
+            }
 
             yield return ServiceDescriber.Singleton<IHttpContextAccessor, HttpContextAccessor>();
             yield return ServiceDescriber.Scoped<HttpWorkContext, HttpWorkContext>();
-            yield return ServiceDescriber.Singleton<IWorkContextProvider, HttpWorkContextProvider>(SmartOptions.Append);
             yield return ServiceDescriber.Transient<ISherlockEnvironment, AspNetEnvironment>();
             yield return ServiceDescriber.Transient<ICookiesAccessor, CookiesAccessor>();
             
             yield return ServiceDescriber.Scoped<IClientEnvironment, ClientEnvironment>();
             
-            yield return ServiceDescriber.Transient<IShellBlueprintItemExporter, ControllerExporter>(SmartOptions.Append);
 
             if (options.MvcFeatures != MvcFeatures.None)
             {
-                yield return ServiceDescriber.Transient<IApplicationModelProvider, SherlockApplicationModeProvider>(SmartOptions.Replace);
-                yield return ServiceDescriber.Transient<IControllerActivator, SherlockControllerActivator>(SmartOptions.Replace);
+                yield return ServiceDescriber.Transient<IApplicationModelProvider, SherlockApplicationModeProvider>(SmartOptions.TryAppend);
 
                 if (options.MvcFeatures == MvcFeatures.Full)
                 {

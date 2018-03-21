@@ -7,22 +7,19 @@ namespace Sherlock.Framework.FileSystem
 {
     public class PhysicalTemporaryFileStorageProvider : ITemporaryFileStorageProvider
     {
-        private IFilePathRouter _router;
-        private IFileUrlProvider _urlProvider;
         private int _timeout = 0;
+        private IFileRequestMapping _fileMapping;
 
-        public PhysicalTemporaryFileStorageProvider(IFilePathRouter router, IFileUrlProvider urlProvider, int fileExpired = 30)
+        public PhysicalTemporaryFileStorageProvider(IFileRequestMapping fileMapping, int fileExpired = 30)
         {
-            Guard.ArgumentNotNull(router, nameof(router));
-            Guard.ArgumentNotNull(urlProvider, nameof(urlProvider));
-            _router = router;
-            _urlProvider = urlProvider;
+            Guard.ArgumentNotNull(fileMapping, nameof(fileMapping));
             _timeout = fileExpired;
+            _fileMapping = fileMapping;
         }
 
         public ITemporaryFileStorage CreateStorage()
         {
-            return new PhysicalTemporaryFileStorage(_timeout, _router, _urlProvider);
+            return new PhysicalTemporaryFileStorage(_timeout, _fileMapping);
         }
     }
 }

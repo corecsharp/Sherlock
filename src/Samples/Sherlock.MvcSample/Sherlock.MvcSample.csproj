@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>Sherlock.MvcSample</AssemblyName>
   </PropertyGroup>
 
@@ -10,15 +10,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Data.Dapper\Sherlock.Framework.Data.Dapper.csproj" />
+    <ProjectReference Include="..\..\Framework\Sherlock.Framework.Scheduling\Sherlock.Framework.Scheduling.csproj" />
+    <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web.Dapper\Sherlock.Framework.Web.Dapper.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web\Sherlock.Framework.Web.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework\Sherlock.Framework.csproj" />
-    <ProjectReference Include="..\..\Tools\Sherlock.Framework.Modularity.Tools.Vs2017\Sherlock.Framework.Modularity.Tools.Vs2017.csproj" />
+    <ProjectReference Include="..\..\Tooling\Sherlock.Framework.Modularity.Tools.Vs2017\Sherlock.Framework.Modularity.Tools.Vs2017.csproj" />
     <ProjectReference Include="..\Sherlock.MvcSample.ApiModule\Sherlock.MvcSample.ApiModule.csproj" />
   </ItemGroup>
 

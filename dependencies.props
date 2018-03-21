@@ -1,0 +1,36 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>3.0</VersionPrefix>
+    <ExperimentalProjectVersionPrefix>0.1.0</ExperimentalProjectVersionPrefix>
+    <VersionSuffix>beta2</VersionSuffix>
+    <PackageVersion Condition="'$(VersionSuffix)' == 'rtm' ">$(VersionPrefix)</PackageVersion>
+    <PackageVersion Condition="'$(VersionSuffix)' != 'rtm' ">$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+    <PackageProjectUrl>http://endink.github.com</PackageProjectUrl>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <Authors>Anders Xiao</Authors>
+    <Copyright>Copyright labijie.com</Copyright>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyOriginatorKeyFile>..\..\..\assembly.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <AssetTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AspNetCorePackageVersion>2.0.1</AspNetCorePackageVersion>
+    <MicrosoftExtensionPackageVersion>2.0</MicrosoftExtensionPackageVersion>
+    <EntityFrameworkPackageVersion>2.0.1</EntityFrameworkPackageVersion>
+    <DotNetCorePackageVersion>4.3.0</DotNetCorePackageVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <DefineConstants>$(DefineConstants);NETFX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
+  </PropertyGroup>
+</Project>

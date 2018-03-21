@@ -16,7 +16,7 @@ namespace Sherlock.Framework.Logging
     /// <summary>
     /// 日志文件记录提供程序（默认文件将被记录在 ~/App_Data/{filename} 文件中）。
     /// </summary>
-    [System.Diagnostics.DebuggerDisplay("FileLogger : {FolderName}")]
+    [DebuggerDisplay("FileLogger : {FolderName}")]
     public class FileLogger : LoggerBase, IDisposable
     {
         private readonly string _folderName;
@@ -117,11 +117,11 @@ namespace Sherlock.Framework.Logging
             /// 
             /// </summary>
             /// <param name="folder"></param>
-            /// <param name="backlogBytesSize">允许内存中挤压的日志内容大小（默认为 20M）</param>
-            public BlockingContent(string folder, int backlogBytesSize = 20 * 1024)
+            /// <param name="backlogSizeKB">允许内存中挤压的日志内容大小（默认为 20M）</param>
+            public BlockingContent(string folder, int backlogSizeKB = 20 * 1024)
             {
                 Guard.AbsolutePhysicalPath(folder, nameof(folder));
-                this.QueueOptions = new QueueOptions() { ConsumeConcurrencyLevel = 1, QueueMaxSizeKBytes = backlogBytesSize };
+                this.QueueOptions = new QueueOptions() { ConsumeConcurrencyLevel = 1, QueueMaxSizeKBytes = backlogSizeKB };
                 _folder = folder;
                 _resetEvent = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
             }

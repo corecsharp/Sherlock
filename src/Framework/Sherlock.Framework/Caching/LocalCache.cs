@@ -25,8 +25,7 @@ namespace Sherlock.Framework.Caching
                         if (_localCache == null)
                         {
                             _localCache = new MemoryCacheManager(new MemoryCacheOptions
-                            {
-                                CompactOnMemoryPressure = true,
+                            { 
                                 ExpirationScanFrequency = TimeSpan.FromMinutes(30)
                             });
                         }

@@ -12,6 +12,15 @@ namespace Sherlock
 {
     partial class SherlockWebUtility
     {
+        public static String GetUserAgent(this HttpRequest request)
+        {
+            if (request.Headers.TryGetValue(HeaderNames.UserAgent, out StringValues userAgent))
+            {
+                return StringValues.IsNullOrEmpty(userAgent) ? null : userAgent.ToString();
+            }
+            return String.Empty;
+        }
+
         private static bool IsUserAgentMatched(this HttpRequest request, Func<String, bool> precidate)
         {
             StringValues userAgent;

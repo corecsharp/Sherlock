@@ -43,7 +43,7 @@ namespace Sherlock.Framework.Environment.Modules
             {
                 list.AddRange(folder.FindAvailableModules());
             });
-            return list;
+            return list.Distinct(m => m.Name).ToArray();
         }
 
         public IEnumerable<FeatureDescriptor> GetAvailableFeatures()

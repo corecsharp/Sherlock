@@ -244,6 +244,6 @@ ModelManifest.xml
 
 # Paket dependency manager
 .paket/paket.exe
-/.idea/.idea.Schubert
+/.idea/.idea.Sherlock
 /.idea
 /.vscode

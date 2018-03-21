@@ -21,7 +21,7 @@ namespace Sherlock.Framework.Environment.ShellBuilders.BuiltinExporters
 
         public ShellBlueprintItem Export(Type type, Feature feature)
         {
-            return new ShellBlueprintItem { Type = type, Feature = feature };
+            return new ShellBlueprintDependencyItem { Type = type, Feature = feature };
         }
     }
 }

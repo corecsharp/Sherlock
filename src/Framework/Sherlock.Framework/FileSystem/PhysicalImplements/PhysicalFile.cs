@@ -9,17 +9,17 @@ namespace Sherlock.Framework.FileSystem
     public class PhysicalFile : IFile
     {
         private string _fullPath = null;
-        private IFileUrlProvider _fileUrlProvider = null;
+        private IFileRequestMapping _mapping = null;
         private string _url = null;
         private string _filePath = null;
         private string _fileName = null;
-        public PhysicalFile(string scope, string filePath, IFilePathRouter router, IFileUrlProvider urlProvider)
+        public PhysicalFile(string scope, string filePath, IFileRequestMapping fileRequestMapping)
         {
-            Guard.ArgumentNotNull(urlProvider, nameof(urlProvider));
+            Guard.ArgumentNotNull(fileRequestMapping, nameof(fileRequestMapping));
             Guard.ArgumentIsRelativePath(filePath, nameof(filePath));
             _filePath = filePath;
-            _fullPath = router.GetFilePath(filePath, scope);
-            _fileUrlProvider = urlProvider;
+            _fullPath = fileRequestMapping.GetFilePath(filePath, scope);
+            _mapping = fileRequestMapping;
         }
 
         public bool Exists
@@ -62,7 +62,7 @@ namespace Sherlock.Framework.FileSystem
 
         public string CreateAccessUrl()
         {
-            return _url ?? (_url = _fileUrlProvider.CreateAccessUrl(_fullPath));
+            return _url ?? (_url = _mapping.CreateAccessUrl(_fullPath));
         }
 
         public Stream CreateReadStream()

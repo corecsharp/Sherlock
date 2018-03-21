@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 
 namespace Sherlock.Framework.Web.Authentication.QQ
@@ -7,8 +7,7 @@ namespace Sherlock.Framework.Web.Authentication.QQ
     {
         public QQOAuthOptions()
         {
-            this.AuthenticationScheme = "QQ";
-            this.DisplayName = this.AuthenticationScheme;
+            //this.SignInScheme = QQDefaults.AuthenticationScheme;
             this.AuthorizationEndpoint = "https://graph.qq.com/oauth2.0/authorize";
             this.TokenEndpoint = "https://graph.qq.com/oauth2.0/token";
             this.UserInformationEndpoint = "https://graph.qq.com/oauth2.0/me";

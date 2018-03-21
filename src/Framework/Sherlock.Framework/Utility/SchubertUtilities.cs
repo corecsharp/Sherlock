@@ -17,6 +17,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Sherlock
 {
@@ -55,6 +56,14 @@ namespace Sherlock
         {
             var assembly = Assembly.GetEntryAssembly();
             return assembly == null ? Directory.GetCurrentDirectory() : Path.GetDirectoryName(new Uri(assembly.CodeBase).LocalPath);
+        }
+
+        /// <summary>
+        /// 提供跨平台的文件夹路径分隔符（对于 linux 是 '/'， 对于 windows 是 '\'）
+        /// </summary>
+        public static char DirectorySeparator
+        {
+            get { return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?  '\\' : '/'; }
         }
 
         /// <summary>
@@ -115,13 +124,25 @@ namespace Sherlock
             return info.EnglishName;
         }
 
-        public static string CombinePath(String basePath, String relativePath)
+        private static string InnerCombinePath(String basePath, String relativePath)
         {
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
             Uri root = new Uri(basePath.TrimEnd('/').TrimEnd('\\') + "/", UriKind.RelativeOrAbsolute);
             var combined = new Uri(root, relativePath);
             return combined.LocalPath;
+        }
+
+        public static string CombinePath(params string[] paths)
+        {
+            Guard.ArgumentNotNullOrEmptyArray(paths, nameof(paths));
+
+            String path = null;
+            for (int i = 0; i < (paths.Length); i++)
+            {
+                path = (path == null) ? paths[i] : InnerCombinePath(path, paths[i]);
+            }
+            return path;
         }
 
 
@@ -204,17 +225,6 @@ namespace Sherlock
         public static string GetMimeType(this IFile file)
         {
             return Helpers.MimeTypeHelper.GetExtension(Path.GetExtension(file.Name));
-        }
-
-        public static ILoggerFactory AddFile(this ILoggerFactory factory, string folder = "logs", Func<string, LogLevel, bool> filter = null, int backlogSizeBytes = 10 * 1024)
-        {
-            factory.AddProvider(new FileLoggerProvider(folder, filter, backlogSizeBytes));
-            return factory;
-        }
-
-        public static ILoggerFactory AddFile(this ILoggerFactory factory, LogLevel minLevel, string folder = "logs", int backlogSizeBytes = 10 * 1024)
-        {
-            return factory.AddFile(folder, (s, l) => l >= minLevel, backlogSizeBytes);
         }
 
         /// <summary>

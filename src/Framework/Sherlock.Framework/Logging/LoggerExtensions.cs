@@ -106,7 +106,7 @@ namespace Sherlock.Framework
         /// <param name="message">消息。</param>
         /// <param name="ex">引发错误的异常。</param>
         /// <param name="extensions">引发错误的异常。</param>
-        public static void WriteError(this ILogger logger, EventId eventId, string message, Exception ex, object extensions = null)
+        public static void WriteError(this ILogger logger, EventId eventId, string message, Exception ex = null, object extensions = null)
         {
             LogEntry log = new LogEntry() { Message = message, EventId = eventId, LogLevel = LogLevel.Error };
             logger.Write(log, ex, extensions);
@@ -185,24 +185,56 @@ namespace Sherlock.Framework
         ///  记录警告日志。
         /// </summary>
         /// <param name="logger">日志记录器。</param>
-        /// <param name="eventId">事件 Id。</param>
         /// <param name="message">错误消息。</param>
-        /// <param name="extensions">扩展信息（匿名对象）。</param>
-        public static void WriteWarning(this ILogger logger, EventId eventId, string message, object extensions = null)
+        public static void WriteWarning(this ILogger logger, string message)
         {
-            LogEntry log = new LogEntry() { Message = message, EventId = eventId, LogLevel = LogLevel.Warning };
-            logger.Write(log, null, extensions);
+            logger.WriteWarning(0, message, null, null);
+        }
+
+        /// <summary>
+        ///  记录警告日志。
+        /// </summary>
+        /// <param name="logger">日志记录器。</param>
+        /// <param name="message">错误消息。</param>
+        /// <param name="exception">异常信息。</param>
+        public static void WriteWarning(this ILogger logger, string message, Exception exception)
+        {
+            logger.WriteWarning(0, message, exception, null);
         }
 
         /// <summary>
         /// 记录警告日志。
         /// </summary>
         /// <param name="logger">日志记录器。</param>
+        /// <param name="eventId">事件 id。</param>
         /// <param name="message">消息。</param>
+        /// <param name="exception">异常信息。</param>
         /// <param name="extensions">扩展信息（匿名对象）。</param>
-        public static void WriteWarning(this ILogger logger, string message, object extensions = null)
+        public static void WriteWarning(this ILogger logger, EventId eventId, string message, Exception exception = null, object extensions = null)
         {
-            logger.WriteWarning(0, message, extensions);
+            LogEntry log = new LogEntry() { Message = message, EventId = eventId, LogLevel = LogLevel.Warning };
+            logger.Write(log, exception, extensions);
+        }
+
+        /// <summary>
+        /// 记录灾难日志。
+        /// </summary>
+        /// <param name="logger">日志记录器。</param>
+        /// <param name="message">错误消息。</param>
+        public static void WriteCritical(this ILogger logger, string message)
+        {
+            logger.WriteCritical(0, message, null, null);
+        }
+
+        /// <summary>
+        /// 记录灾难日志。
+        /// </summary>
+        /// <param name="logger">日志记录器。</param>
+        /// <param name="message">错误消息。</param>
+        /// <param name="exception">异常对象。</param>
+        public static void WriteCritical(this ILogger logger, string message, Exception exception)
+        {
+            logger.WriteCritical(0, message, exception, null);
         }
 
         /// <summary>
@@ -211,22 +243,12 @@ namespace Sherlock.Framework
         /// <param name="logger">日志记录器。</param>
         /// <param name="eventId">事件 Id。</param>
         /// <param name="message">错误消息。</param>
+        /// <param name="exception">异常信息。</param>
         /// <param name="extensions">扩展信息（匿名对象）。。</param>
-        public static void WriteCritical(this ILogger logger, EventId eventId, string message, object extensions = null)
+        public static void WriteCritical(this ILogger logger, EventId eventId, string message, Exception exception = null, object extensions = null)
         {
             LogEntry log = new LogEntry() { Message = message, EventId = eventId, LogLevel = LogLevel.Critical };
-            logger.Write(log, null, extensions);
-        }
-
-        /// <summary>
-        /// 记录灾难日志。
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="message">消息。</param>
-        /// <param name="extensions">扩展信息（匿名对象）。</param>
-        public static void WriteCritical(this ILogger logger, string message, object extensions = null)
-        {
-            logger.WriteCritical(0, message, extensions);
+            logger.Write(log, exception, extensions);
         }
 
         /// <summary>

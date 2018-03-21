@@ -24,6 +24,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Security;
 using System.Runtime.InteropServices;
+using Sherlock;
 
 namespace System
 {
@@ -41,7 +42,36 @@ namespace System
                 return instance;
             }
 
-            return Regex.Escape(instance);
+            StringBuilder builder = new StringBuilder();
+            //Regex.Escape 不会对]、} 处理。
+            foreach (char c in instance)
+            {
+                switch (c)
+                {
+                    case '\\':
+                    case '(':
+                    case ')':
+                    case '[':
+                    case ']':
+                    case '{':
+                    case '}':
+                    case '.':
+                    case '-':
+                    case '*':
+                    case '+':
+                    case '?':
+                    case '|':
+                    case '^':
+                    case '$':
+                        builder.Append('\\');
+                        builder.Append(c);
+                        break;
+                    default:
+                        builder.Append(c);
+                        break;
+                }
+            }
+            return builder.ToString();
         }
 
         /// <summary>
@@ -129,6 +159,34 @@ namespace System
                 ss.AppendChar(c);
             }
             return ss;
+        }
+
+        public static String TrimEnd(this String source, String str)
+        {
+            Guard.ArgumentNotNull(source, nameof(source));
+            if (str.IsNullOrEmpty() || str.Length > source.Length)
+            {
+                return str;
+            }
+            if (source.Substring(source.Length - str.Length).Equals(str))
+            {
+                return source.Substring(0, source.Length - str.Length - 1);
+            }
+            return source;
+        }
+
+        public static String TrimStart(this String source, String str)
+        {
+            Guard.ArgumentNotNull(source, nameof(source));
+            if (str.IsNullOrEmpty() || str.Length > source.Length)
+            {
+                return str;
+            }
+            if (source.Substring(0, str.Length).Equals(str))
+            {
+                return source.Substring(str.Length);
+            }
+            return source;
         }
 
         #region Serialize

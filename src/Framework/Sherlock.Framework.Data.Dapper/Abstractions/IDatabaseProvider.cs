@@ -70,7 +70,7 @@ namespace Sherlock.Framework.Data
         /// 获取一个值，指示数据提供程序是否支持生成批量插入操作的 SQL 语句。
         /// </summary>
         bool BuildBatchInsertSqlSupported { get; }
-
+        
     }
 
     public static class DatabaseProviderExtensions

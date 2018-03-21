@@ -26,4 +26,34 @@ namespace Sherlock.Framework.Threading
         /// <returns></returns>
         IEnumerable<ITimeout> Stop();
     }
+
+    public static class ITimeoutTimerExtensions
+    {
+        /// <summary>
+        /// 在 <paramref name="delay"/> 置顶的延时之后执行一次性调度任务。
+        /// </summary>
+        /// <param name="timer"></param>
+        /// <param name="action">要执行的任务。</param>
+        /// <param name="delay">延迟时间。</param>
+        /// <returns><see cref="ITimeout"/> 对象。</returns>
+        public static ITimeout NewTimeout(this ITimeoutTimer timer, Action<ITimeout> action, TimeSpan delay)
+        {
+            Guard.ArgumentNotNull(action, nameof(action));
+            return timer.NewTimeout(new DelegateTask(action), delay);
+        }
+        private class DelegateTask : ITimerTask
+        {
+            private Action<ITimeout> _delegate;
+
+            public DelegateTask(Action<ITimeout> @delegate)
+            {
+                _delegate = @delegate;
+            }
+
+            public void Run(ITimeout timeout)
+            {
+                _delegate.Invoke(timeout);
+            }
+        }
+    }
 }

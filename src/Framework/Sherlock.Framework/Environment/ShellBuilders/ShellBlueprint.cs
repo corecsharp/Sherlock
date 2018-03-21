@@ -41,7 +41,7 @@ namespace Sherlock.Framework.Environment.ShellBuilders
         /// <summary>
         /// 获取或设置蓝图中的 <see cref="IDependencyDescriber"/> 。
         /// </summary>
-        public IEnumerable<ShellBlueprintItem> DependencyDescribers => (this.ExportedItems?.GetOrDefault(BuiltinBlueprintItemCategories.DependencyDescriber) ?? Enumerable.Empty<ShellBlueprintItem>()).OfType<ControllerBlueprintItem>();
+        public IEnumerable<ShellBlueprintItem> DependencyDescribers  => (this.ExportedItems?.GetOrDefault(BuiltinBlueprintItemCategories.DependencyDescriber) ?? Enumerable.Empty<ShellBlueprintItem>()).OfType<ShellBlueprintItem>();
 
         /// <summary>
         /// 获取或设置配置选项。

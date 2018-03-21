@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.DependencyInjection;
 using Sherlock.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,9 +21,18 @@ namespace Sherlock.Framework.Web.DependencyInjection
         internal Action<IMvcCoreBuilder> MvcCoreSetup { get; set; }
         internal Action<SherlockWebOptions> FeatureSetup { get; set; }
 
+        internal Action<CookieAuthenticationOptions> CookieSetup { get; set; }
+
         internal List<WebStarter> WebStarters { get; } = new List<WebStarter>();
-        
-        
+
+        public HashSet<Guid> AddedModules { get; } = new HashSet<Guid>();
+
+
+        public SherlockWebBuilder ConfigureServices(Action<IServiceCollection> configre)
+        {
+            configre?.Invoke(_builder.ServiceCollection);
+            return this;
+        }
 
         /// <summary>
         /// 添加 Web 启动器。
@@ -42,7 +52,7 @@ namespace Sherlock.Framework.Web.DependencyInjection
         /// <returns></returns>
         public SherlockWebBuilder ConfigureFeature(Action<SherlockWebOptions> setup)
         {
-            this.FeatureSetup = setup;
+            this.FeatureSetup += setup;
             return this;
         }
 
@@ -53,7 +63,7 @@ namespace Sherlock.Framework.Web.DependencyInjection
         /// <returns></returns>
         public SherlockWebBuilder ConfigureMvc(Action<IMvcBuilder> mvcSetup)
         {
-            this.MvcSetup = mvcSetup;
+            this.MvcSetup += mvcSetup;
             return this;
         }
 
@@ -64,7 +74,18 @@ namespace Sherlock.Framework.Web.DependencyInjection
         /// <returns></returns>
         public SherlockWebBuilder ConfigureMvcCore(Action<IMvcCoreBuilder> mvcSetup)
         {
-            this.MvcCoreSetup = mvcSetup;
+            this.MvcCoreSetup += mvcSetup;
+            return this;
+        }
+
+        /// <summary>
+        /// 配置 Cookie 和 基于 Cookie 的身份认证的相关的选项。
+        /// </summary>
+        /// <param name="cookieSetup"></param>
+        /// <returns></returns>
+        public SherlockWebBuilder ConfigureCookie(Action<CookieAuthenticationOptions> cookieSetup)
+        {
+            this.CookieSetup += cookieSetup;
             return this;
         }
     }

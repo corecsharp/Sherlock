@@ -34,7 +34,7 @@ namespace Sherlock.Framework.DependencyInjection
         /// </summary>
         public SmartOptions Options { get; set; }
 
-        public static SmartServiceDescriptor Create(ServiceDescriptor descriptor, SmartOptions options = SmartOptions.TryAppend)
+        public static SmartServiceDescriptor Create(ServiceDescriptor descriptor, SmartOptions options = SmartOptions.TryAdd)
         {
             Guard.ArgumentNotNull(descriptor, nameof(descriptor));
 
@@ -67,9 +67,9 @@ namespace Sherlock.Framework.DependencyInjection
         Append,
 
         /// <summary>
-        /// 表示在尾部尝试追加。
+        /// 表示在尾部尝试添加，如果已经存在其他实现，则不会再进行添加。
         /// </summary>
-        TryAppend,
+        TryAdd,
 
         /// <summary>
         /// 表示在顶部插入。
@@ -79,7 +79,12 @@ namespace Sherlock.Framework.DependencyInjection
         /// <summary>
         /// 表示先移除列表中具有相同 ServiceType 的第一条服务，然后再追加。
         /// </summary>
-        Replace
+        Replace,
+
+        /// <summary>
+        /// 表示尝试追加，如果已经存在其他实现会将该实现添加到尾部，如果已存在该实现，则不进行任何操作。
+        /// </summary>
+        TryAppend
     }
     public static class SmartServiceCollectionExtensions
     {
@@ -110,11 +115,14 @@ namespace Sherlock.Framework.DependencyInjection
                 case SmartOptions.Append:
                     collection.Add(descriptor);
                     break;
-                case SmartOptions.TryAppend:
+                case SmartOptions.TryAdd:
                     collection.TryAdd(descriptor);
                     break;
                 case SmartOptions.Insert:
                     collection.Insert(0, descriptor);
+                    break;
+                case SmartOptions.TryAppend:
+                    collection.TryAddEnumerable(descriptor);
                     break;
                 default:
                     collection.Replace(descriptor);

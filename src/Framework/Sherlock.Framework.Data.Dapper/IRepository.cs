@@ -10,11 +10,13 @@ namespace Sherlock.Framework.Data
         Task<int> DeleteAsync(T entity);
         int Delete(QueryFilter filter);
         Task<int> DeleteAsync(QueryFilter filter);
+
         int Insert(T entity);
+
         Task<int> InsertAsync(T entity);
 
         int Insert(IEnumerable<T> entities);
-
+        Task<int> InsertAsync(IEnumerable<T> entities);
 
         int Update(T entity);
         Task<int> UpdateAsync(T entity);

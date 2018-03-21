@@ -153,7 +153,7 @@ namespace Sherlock.Framework.Environment.ShellBuilders
         {
             Dictionary<Type, MethodInfo[]> methodsCache = new Dictionary<Type, MethodInfo[]>();
             HashSet<String> flags = new HashSet<String>(); //处理重复项。
-            foreach (var item in blueprint.Dependencies)
+            foreach (var item in blueprint.Dependencies.Cast<ShellBlueprintDependencyItem>())
             {
                 var interfaceTypes = item.Type.GetTypeInfo().GetInterfaces().Where(itf => typeof(IDependency).GetTypeInfo().IsAssignableFrom(itf)).ToArray();
                 if (interfaceTypes.Length == 0)
@@ -172,30 +172,37 @@ namespace Sherlock.Framework.Environment.ShellBuilders
                     //注册 IDependency，特别注意，如果一类型上直接使用了 IDependency 接口，理解为想要直接注入该类型。
                     foreach (var interfaceType in interfaceTypes.Where(i => !IsDependencyInterface(i)))
                     {
-                        RegisterBluePrintItem(smartServiceDescriptors, eventSubs, methodsCache, flags, item, interfaceType);
+                        var interfaceInfo = interfaceType.GetTypeInfo();
+                        var itemInfo = item.Type.GetTypeInfo();
+                        if (!interfaceInfo.IsGenericType || (interfaceInfo.IsGenericTypeDefinition && itemInfo.IsGenericTypeDefinition)) //不能是非定义的泛型接口
+                        {
+                            RegisterBluePrintItem(smartServiceDescriptors, eventSubs, methodsCache, flags, item, interfaceType);
+                        }
                     }
                 }
             }
         }
 
-        private void RegisterBluePrintItem(List<SmartServiceDescriptor> smartServiceDescriptors, List<EventSubscriptionDescriptor> eventSubs, Dictionary<Type, MethodInfo[]> methodsCache, HashSet<string> flags, ShellBlueprintItem item, Type interfaceType)
+        private void RegisterBluePrintItem(List<SmartServiceDescriptor> smartServiceDescriptors, List<EventSubscriptionDescriptor> eventSubs, Dictionary<Type, MethodInfo[]> methodsCache, HashSet<string> flags, ShellBlueprintDependencyItem item, Type interfaceType)
         {
             SmartServiceDescriptor descriptor = null;
             if (typeof(ISingletonDependency).GetTypeInfo().IsAssignableFrom(interfaceType))
             {
                 eventSubs.AddRange(CreateDescriptor(methodsCache, flags, interfaceType, item.Type, ServiceLifetime.Singleton));
                 descriptor = ServiceDescriber.Singleton(interfaceType, item.Type, SmartOptions.Append);
-
+                item.Interfaces.Add(new Tuple<Type, ServiceLifetime>(interfaceType, ServiceLifetime.Singleton));
             }
             else if (typeof(ITransientDependency).GetTypeInfo().IsAssignableFrom(interfaceType))
             {
                 eventSubs.AddRange(CreateDescriptor(methodsCache, flags, interfaceType, item.Type, ServiceLifetime.Transient));
                 descriptor = ServiceDescriber.Transient(interfaceType, item.Type, SmartOptions.Append);
+                item.Interfaces.Add(new Tuple<Type, ServiceLifetime>(interfaceType, ServiceLifetime.Transient));
             }
             else
             {
                 eventSubs.AddRange(CreateDescriptor(methodsCache, flags, interfaceType, item.Type, ServiceLifetime.Scoped));
                 descriptor = ServiceDescriber.Scoped(interfaceType, item.Type, SmartOptions.Append);
+                item.Interfaces.Add(new Tuple<Type, ServiceLifetime>(interfaceType, ServiceLifetime.Scoped));
             }
 
             if (descriptor != null)

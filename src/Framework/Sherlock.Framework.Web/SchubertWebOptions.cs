@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Sherlock.Framework.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Sherlock.Framework.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 
 namespace Sherlock.Framework.Web
 {
@@ -16,11 +19,17 @@ namespace Sherlock.Framework.Web
     public class SherlockWebOptions
     {
         private int _sessionTimeoutMinutes;
+        private JsonResolverSettings _jsonResolverSettings;
 
         public SherlockWebOptions()
         {
             this._sessionTimeoutMinutes = 30;
         }
+        
+        /// <summary>
+        /// 是否使用基于 Cookie 的身份认证（默认为 true, 对于 web api 程序可以将其关闭）。
+        /// </summary>
+        public bool UseCookieAuth { get; set; } = true;
 
         /// <summary>
         /// 获取或设置一个值，指示包含的 ASP.Net MVC 特性（默认为 <see cref="MvcFeatures.Full"/>）。
@@ -48,29 +57,18 @@ namespace Sherlock.Framework.Web
         public int IdentityCacheTimeoutMinutes { get; set; } = 10;
 
         /// <summary>
-        /// 登录页面路径（默认为 /Login）。
-        /// </summary>
-        public PathString LoginPath { get; set; } = new PathString("/Login");
-
-        /// <summary>
-        /// 注销 action 路径（默认为 /LogOff）。
-        /// </summary>
-        public PathString LogoutPath { get; set; } = new PathString("/LogOff");
-
-        /// <summary>
-        /// 确定 Cookie 是否只应根据 HTTPS 请求传输。 默认值是当正在执行登录的页面也是 HTTPS 时将 Cookie 限制为 HTTPS 请求。 如果你有 HTTPS 登录页并且你的部分站点是 HTTP，则可能需要更改此值。 
-        /// </summary>
-        public CookieSecurePolicy CookieSecure { get; set; } = CookieSecurePolicy.SameAsRequest;
-
-        /// <summary>
         /// 获取或设置JSON的格式化的拼写风格（默认为 camel ）。
         /// </summary>
-        public CapitalizationStyle JsonCapitalizationStyle { get; set; } = CapitalizationStyle.CamelCase;
+        public JsonCaseStyle JsonCaseStyle { get; set; } = JsonCaseStyle.CamelCase;
 
         /// <summary>
-        /// 获取或设置 JSON 序列化时是否将 long 序列化为 string 类型 （通常用于解决 javascript 不支持 64 位整数问题）。
+        /// 获取或设置 JSON 序列化时特殊处理模式 （通常用于解决 javascript 不支持 64 位整数问题）。
         /// </summary>
-        public bool JsonSerializeLongAsString { get; set; } = false;
+        public JsonResolverSettings JsonResolver
+        {
+            get { return _jsonResolverSettings ?? (_jsonResolverSettings = new JsonResolverSettings()); }
+            set { _jsonResolverSettings = value; }
+        }
 
     }
 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sherlock.Framework.Scheduling;
 
 namespace Sherlock.MvcSample
 {
@@ -18,13 +19,7 @@ namespace Sherlock.MvcSample
             var builder = new ConfigurationBuilder()
               .SetBasePath(env.ContentRootPath)
               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-//#if !DEBUG 
-//             .AddConfigurationCenter(env.ContentRootPath)
-//#endif
-          //TODO 注册中心连不上的时候要警告 
-          .AddEnvironmentVariables();
-
+           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
             Configuration = builder.Build();
         }
 
@@ -38,23 +33,17 @@ namespace Sherlock.MvcSample
             services.AddSherlockFramework(Configuration,
                 builder =>
                 {
-
+                    builder.AddJobScheduling();
                     builder.AddWebFeature(web =>
                     {
                         web.ConfigureFeature(settings =>
                         {
                             settings.MvcFeatures = Sherlock.Framework.Web.MvcFeatures.Api;
-                            settings.JsonSerializeLongAsString = true;
-                            settings.JsonCapitalizationStyle = Sherlock.Framework.Web.CapitalizationStyle.PascalCase;
+                            settings.JsonCaseStyle = Framework.Web.JsonCaseStyle.PascalCase;
                         });
 
                     });
                     builder.AddDapperDataFeature();
-                },
-                scope =>
-                {
-                    scope.LoggerFactory.AddConsole(LogLevel.Error);
-                    //scope.LoggerFactory.AddFile("d:\\start_log.txt");
                 });
         }
 
@@ -62,6 +51,10 @@ namespace Sherlock.MvcSample
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             //loggerFactory.AddConsole(LogLevel.Warning);
+            app.ApplicationServices.GetRequiredService<ISchedulingServer>();
+            loggerFactory.AddConsole(LogLevel.Information);
+            loggerFactory.AddDebug(LogLevel.Error);
+            app.UseSession();
             app.StartSherlockWebApplication();
         }
     }

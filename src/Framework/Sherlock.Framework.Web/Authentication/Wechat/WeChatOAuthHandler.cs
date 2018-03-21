@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace Sherlock.Framework.Web.Authentication.Wechat
     {
         private const string _regexSEQuery = @"(?<=(\&|\?|^)({0})\=).*?(?=\&|$)";
 
-        public WeChatOAuthHandler(HttpClient backchannel) : base(backchannel)
+        public WeChatOAuthHandler(IOptionsMonitor<WeChatOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
 
@@ -77,22 +78,23 @@ namespace Sherlock.Framework.Web.Authentication.Wechat
         {
             string openId = await RequestWechatOpenId(tokens);
             JObject user = await this.RequestWechatUserInfo(openId, tokens);
-
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), properties, this.Options.AuthenticationScheme);
-            OAuthCreatingTicketContext context = new OAuthCreatingTicketContext(ticket, this.Context, this.Options, this.Backchannel, tokens, user);
-
+            
             if (!WeChatHelper.HasError(user))
             {
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, WeChatHelper.GetId(user), ClaimValueTypes.String, this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim("urn:qqaccount:openid", WeChatHelper.GetId(user), ClaimValueTypes.String, this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim(ClaimTypes.Name, WeChatHelper.GetNickName(user), this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim(ClaimTypes.Gender, WeChatHelper.GetGender(user), this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim(ClaimTypes.Email, $"{WeChatHelper.GetId(user)}@qq.com", this.Options.AuthenticationScheme));
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, WeChatHelper.GetId(user), ClaimValueTypes.String));
+                identity.AddClaim(new Claim("urn:qqaccount:openid", WeChatHelper.GetId(user), ClaimValueTypes.String));
+                identity.AddClaim(new Claim(ClaimTypes.Name, WeChatHelper.GetNickName(user)));
+                identity.AddClaim(new Claim(ClaimTypes.Gender, WeChatHelper.GetGender(user)));
+                identity.AddClaim(new Claim(ClaimTypes.Email, $"{WeChatHelper.GetId(user)}@qq.com"));
             }
-            
 
-            await this.Options.Events.CreatingTicket(context);
-            return context.Ticket;
+            OAuthCreatingTicketContext context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity), properties, this.Context, this.Scheme, this.Options, this.Backchannel, tokens, user);
+
+            context.RunClaimActions();
+
+            await Events.CreatingTicket(context);
+
+            return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
         
 

@@ -176,11 +176,9 @@ namespace Sherlock.Framework.Environment.ShellBuilders
             blueprint.Descriptor = descriptor;
             blueprint.ExportedItems = saveItems;
 
-            _logger.WriteInformation($@"蓝图加载完成
-    Modules {blueprint.Modules.Count()}（{blueprint.Modules.ToArrayString()}）
-    Controller: {blueprint.Controllers.Count()}
-    Dependencies: {blueprint.Dependencies.Count()}
-    DependencyDescribers: {blueprint.DependencyDescribers.Count()}");
+            
+            _logger.WriteInformation($"蓝图加载完成。");
+
             return blueprint;
         }
 

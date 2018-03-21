@@ -61,7 +61,7 @@ namespace Sherlock.Framework.Environment
             {
                 subPath = virtualPath.Substring(1);
             }
-            subPath.Replace('/', '\\');
+            subPath.Replace('/', SherlockUtility.DirectorySeparator);
             return Path.Combine(this.RootDirectoryPhysicalPath, subPath);
         }
     }

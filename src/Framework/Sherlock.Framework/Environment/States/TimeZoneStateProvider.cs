@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Sherlock.Framework.Environment;
+using Sherlock.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,7 +26,7 @@ namespace Sherlock.Framework.Web
                 {
                     String timeZone = ctx.CurrentUser?.TimeZone;
                     string timeZoneId = timeZone.IfNullOrWhiteSpace(_options.Value.DefaultTimeZone);
-                    return TimeZoneInfo.FindSystemTimeZoneById(timeZoneId) ?? TimeZoneInfo.Local;
+                    return TimeZoneHelper.GetTimeZoneInfo(timeZoneId) ?? TimeZoneInfo.Local;
                 };
             }
             return null;

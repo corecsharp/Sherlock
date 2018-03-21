@@ -1,4 +1,5 @@
 ﻿using Sherlock.Framework.Domain;
+using Sherlock.Framework.Environment;
 using Sherlock.Framework.Services;
 using System;
 using System.Collections.Generic;
@@ -10,29 +11,35 @@ namespace Sherlock.Framework.Localization
 {
     public class LocalizedStringManager : ILocalizedStringManager
     {
-        private ILanguageService _languageService;
         private const string XmlNamespace = "http://www.labiji.com/LanguageXMLSchema";
+        private IWorkContextAccessor _workContextAccessor;
 
-        public LocalizedStringManager(ILanguageService languageService)
+        public LocalizedStringManager(IWorkContextAccessor workContextAccessor)
         {
-            Guard.ArgumentNotNull(languageService, nameof(languageService));
-
-            _languageService = languageService;
+            Guard.ArgumentNotNull(workContextAccessor, nameof(workContextAccessor));
+            _workContextAccessor = workContextAccessor;
         }
 
+        private ILanguageService CreateLanguageService()
+        {
+            return _workContextAccessor.GetContext().Resolve<ILanguageService>() ?? new NullLanguageService();
+        }
 
         public async Task<IEnumerable<String>> GetLocalizedStringKeys(string cultureName)
         {
             Guard.ArgumentNullOrWhiteSpaceString(cultureName, nameof(cultureName));
-
-            var lang = await _languageService.GetLanguageAsync(cultureName);
+            var langSvc = this.CreateLanguageService();
+            
+            var lang = await langSvc.GetLanguageAsync(cultureName);
             return lang?.StringResources?.Select(r => r.ResourceName) ?? Enumerable.Empty<String>();
         }
 
         public async Task<string> ExportLanguageXmlAsync(string cultureName)
         {
             Guard.ArgumentNullOrWhiteSpaceString(cultureName, nameof(cultureName));
-            Language language = await _languageService.GetLanguageAsync(cultureName);
+
+            var langSvc = this.CreateLanguageService();
+            Language language = await langSvc.GetLanguageAsync(cultureName);
             if (language != null)
             {
                 var content = GetLanguageElementContent(language).ToArray();
@@ -62,7 +69,8 @@ namespace Sherlock.Framework.Localization
 
         public string GetLocalizedString(string cultureName, string key)
         {
-            string ls = _languageService.GetLanguageAsync(cultureName).GetAwaiter().GetResult()?
+            var langSvc = this.CreateLanguageService();
+            string ls = langSvc.GetLanguageAsync(cultureName).GetAwaiter().GetResult()?
                 .StringResources?.FirstOrDefault(r => r.ResourceName == key)?.ResourceValue;
 
             return ls.IfNullOrWhiteSpace(String.Empty);
@@ -76,7 +84,9 @@ namespace Sherlock.Framework.Localization
                 string culture;
                 XElement root = LoadLanguageElement(xd, out culture);
                 Dictionary<string, StringResource> resources = LoadLanguageResources(culture, root);
-                await _languageService.AddStringResourcesAsync(resources.Values, policy);
+
+                var langSvc = this.CreateLanguageService();
+                await langSvc.AddStringResourcesAsync(resources.Values, policy);
             }
         }
 

@@ -48,7 +48,7 @@ namespace Sherlock.Framework.FileSystem
         {
             scope = scope.IfNullOrWhiteSpace(DefaultScope);
             var supported = _patterns.Any(p => Regex.IsMatch(scope, p, RegexOptions.IgnoreCase));
-            return new PhysicalFileStorage(scope, _options.PathRouter, _options.UrlProvider);
+            return new PhysicalFileStorage(scope, _options.FileMapping);
         }
     }
 }

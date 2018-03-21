@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 
 namespace Sherlock.Framework.Web.Authentication.Wechat
@@ -7,8 +7,7 @@ namespace Sherlock.Framework.Web.Authentication.Wechat
     {
         public WeChatOptions()
         {
-            this.AuthenticationScheme = "WeChat";
-            this.DisplayName = "微信";
+            //this.SignInScheme = WechatDefaults.AuthenticationScheme;
             this.AuthorizationEndpoint = "https://open.weixin.qq.com/connect/qrconnect";
             this.TokenEndpoint = "https://api.weixin.qq.com/sns/oauth2/access_token";
             this.UserInformationEndpoint = "https://graph.qq.com/me";

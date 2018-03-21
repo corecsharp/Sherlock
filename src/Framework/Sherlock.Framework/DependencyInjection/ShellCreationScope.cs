@@ -14,36 +14,12 @@ namespace Sherlock.Framework.DependencyInjection
     /// </summary>
     public sealed  class ShellCreationScope
     {
-        private ILoggerFactory _loggerFactory = null;
-        private IAppDataFolder _appDataForlder = null;
-        private ISherlockEnvironment _enviroment = null;
 
-        internal ShellCreationScope(IServiceProvider serviceProvider)
-        {
-            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
-            this.ServiceProvider = serviceProvider;
-        }
-        public IServiceProvider ServiceProvider { get; private set; }
+        internal Action<ILoggingBuilder> LoggingConfigure { get; set; }
 
-        public ISherlockEnvironment Environment
+        public void ConfigureLogging(Action<ILoggingBuilder> configure)
         {
-            get { return _enviroment ?? (_enviroment = ServiceProvider.GetRequiredService<ISherlockEnvironment>());  }
-        }
-
-        /// <summary>
-        /// 获取 Shell 创建环境中的日志工厂。
-        /// </summary>
-        public ILoggerFactory LoggerFactory
-        {
-            get { return _loggerFactory ?? (_loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>()); }
-        }
-
-        /// <summary>
-        /// 获取 Shell 创建环境中的 AppData 目录。
-        /// </summary>
-        public IAppDataFolder AppDataFolder
-        {
-            get { return _appDataForlder ?? (_appDataForlder = ServiceProvider.GetRequiredService<IAppDataFolder>()); }
+            this.LoggingConfigure += configure;
         }
     }
 }

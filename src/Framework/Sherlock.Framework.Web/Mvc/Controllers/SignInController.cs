@@ -47,7 +47,8 @@ namespace Sherlock.Framework.Web.Mvc.Controllers
             {
                 if (info.ProviderDisplayName.IsNullOrWhiteSpace()) //微软BUG？没有带出 DisplayName
                 {
-                    var p = this.SignInManager.GetExternalAuthenticationSchemes().FirstOrDefault(s => s.AuthenticationScheme.CaseInsensitiveEquals(info.LoginProvider));
+                    var schemas = await this.SignInManager.GetExternalAuthenticationSchemesAsync();
+                    var p = schemas.FirstOrDefault(s => s.Name.CaseInsensitiveEquals(info.LoginProvider));
                     info.ProviderDisplayName = p?.DisplayName;
                 }
             }
@@ -76,7 +77,8 @@ namespace Sherlock.Framework.Web.Mvc.Controllers
             }
             if (info.ProviderDisplayName.IsNullOrWhiteSpace()) //微软BUG？没有带出 DisplayName
             {
-                var p = this.SignInManager.GetExternalAuthenticationSchemes().FirstOrDefault(s => s.AuthenticationScheme.CaseInsensitiveEquals(info.LoginProvider));
+                var schemas = await this.SignInManager.GetExternalAuthenticationSchemesAsync();
+                var p = schemas.FirstOrDefault(s => s.Name.CaseInsensitiveEquals(info.LoginProvider));
                 info.ProviderDisplayName = p?.DisplayName;
             }
             Microsoft.AspNetCore.Identity.SignInResult result = await ExternalLoginSignInAsync(info);

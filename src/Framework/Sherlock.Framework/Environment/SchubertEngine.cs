@@ -60,37 +60,37 @@ namespace Sherlock.Framework.Environment
         /// <summary>
         /// 获取应用程序当前的运行时 Framework 名称（包含平台标识，版本号等信息。 关于 <see cref="System.Runtime.Versioning.FrameworkName"/> 类更多请参考 MSDN）。
         /// </summary>
-        public FrameworkName FrameworkName { get; internal set; }
+        public String FrameworkName { get; internal set; }
 
         /// <summary>
         /// 获取一值，只是当前环境中 Shell 是否已经创建。
         /// </summary>
         public bool ShellCreated { get; internal set; }
 
-        /// <summary>
-        /// 获取应用程序当前的运行时 Framework （暂时只支持判断 Microsoft 平台，Mono等平台可能显示为 Unknown）。
-        /// </summary>
-        public RuntimeFramework Framework
-        {
-            get
-            {
-                if (this.FrameworkName == null)
-                {
-                    return RuntimeFramework.Unknown;
-                }
-                switch (this.FrameworkName.Identifier)
-                {
-                    case "DNXCore":
-                        return RuntimeFramework.DNXCore;
-                    case "DNX":
-                        return RuntimeFramework.DNX;
-                    case ".NetFramework":
-                        return RuntimeFramework.Net;
-                    default:
-                        return RuntimeFramework.Unknown;
-                }
-            }
-        }
+        ///// <summary>
+        ///// 获取应用程序当前的运行时 Framework （暂时只支持判断 Microsoft 平台，Mono等平台可能显示为 Unknown）。
+        ///// </summary>
+        //public RuntimeFramework Framework
+        //{
+        //    get
+        //    {
+        //        if (this.FrameworkName == null)
+        //        {
+        //            return RuntimeFramework.Unknown;
+        //        }
+        //        switch (this.FrameworkName.Identifier)
+        //        {
+        //            case "DNXCore":
+        //                return RuntimeFramework.DNXCore;
+        //            case "DNX":
+        //                return RuntimeFramework.DNX;
+        //            case ".NetFramework":
+        //                return RuntimeFramework.Net;
+        //            default:
+        //                return RuntimeFramework.Unknown;
+        //        }
+        //    }
+        //}
 
         internal void LoadEnvironment(IServiceProvider serviceProvider)
         {

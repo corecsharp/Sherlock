@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.PlatformAbstractions;
 using Sherlock.Framework.Environment;
 using System;
+using System.Reflection;
 using System.Runtime.Versioning;
 
 namespace Sherlock.Framework.Web
@@ -16,7 +16,7 @@ namespace Sherlock.Framework.Web
 
             this.Environment = hosting.EnvironmentName.IfNullOrWhiteSpace("production").ToLower();
             this.IsDevelopmentEnvironment = hosting.IsDevelopment();
-            this.RuntimeFramework = PlatformServices.Default.Application.RuntimeFramework;
+            this.RuntimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;
             //this.ApplicationBasePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
             this.ApplicationBasePath = SherlockUtility.GetApplicationDirectory();
 
@@ -34,6 +34,6 @@ namespace Sherlock.Framework.Web
 
         public bool IsDevelopmentEnvironment { get; }
 
-        public FrameworkName RuntimeFramework { get; }
+        public String RuntimeFramework { get; }
     }
 }

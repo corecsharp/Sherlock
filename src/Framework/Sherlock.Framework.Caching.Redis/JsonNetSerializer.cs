@@ -16,7 +16,7 @@ namespace Sherlock.Framework.Caching
             _serializer.NullValueHandling = NullValueHandling.Ignore;
             _serializer.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
             _serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            _serializer.TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple;
+            _serializer.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
             _serializer.TypeNameHandling = TypeNameHandling.Objects;
         }
 

@@ -13,18 +13,16 @@ namespace Sherlock.Framework.Environment
     public class DefaultRuntimeEnvironment : ISherlockEnvironment
     {
         private IInstanceIdProvider _instanceIdProvider = null;
-        private IFrameworkNameProvider _frameworkNameProvider = null;
 
-        public DefaultRuntimeEnvironment(String complieConfiguration, IFrameworkNameProvider frameworkNameProvider, IInstanceIdProvider instanceIdProvider)
+        public DefaultRuntimeEnvironment(String complieConfiguration, IInstanceIdProvider instanceIdProvider)
         {
             Guard.ArgumentNotNull(instanceIdProvider, nameof(instanceIdProvider));
-            _frameworkNameProvider = frameworkNameProvider ?? new DefaultFrameworkNameProvider();
 
             _instanceIdProvider = instanceIdProvider;
             this.IsDevelopmentEnvironment = (complieConfiguration.IfNullOrWhiteSpace(String.Empty)).CaseInsensitiveEquals("development");
             this.Environment = complieConfiguration.IfNullOrWhiteSpace("Production").ToLower();
             this.ApplicationBasePath = SherlockUtility.GetApplicationDirectory();
-            this.RuntimeFramework = _frameworkNameProvider.GetCurrentName() ?? new FrameworkName("UNKNOWN", new Version(0, 0, 0));
+            this.RuntimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;
 
         }
 
@@ -39,6 +37,6 @@ namespace Sherlock.Framework.Environment
 
         public string ApplicationBasePath { get; }
         public string Configuration { get; }
-        public FrameworkName RuntimeFramework { get; }
+        public String RuntimeFramework { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 
 namespace Sherlock.Framework.Web.Authentication.Weibo
@@ -7,8 +7,7 @@ namespace Sherlock.Framework.Web.Authentication.Weibo
     {
         public WeiboOAuthOptions()
         {
-            this.AuthenticationScheme = "Weibo";
-            this.DisplayName = "微博";
+            //this.SignInScheme = WeiboDefaults.AuthenticationScheme;
             this.AuthorizationEndpoint = "https://api.weibo.com/oauth2/authorize";
             this.TokenEndpoint = "https://api.weibo.com/oauth2/access_token";
             this.UserInformationEndpoint = "https://api.weibo.com/oauth2/get_token_info";

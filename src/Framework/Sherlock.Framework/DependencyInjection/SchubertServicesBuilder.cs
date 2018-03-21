@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sherlock.Framework.Environment.Modules;
 using System;
+using System.Collections.Generic;
 
 namespace Sherlock.Framework.DependencyInjection
 {
@@ -13,6 +14,8 @@ namespace Sherlock.Framework.DependencyInjection
     {
         private IServiceCollection _serviceCollection;
         private IConfiguration _configuration;
+
+        public HashSet<Guid> AddedModules { get; } = new HashSet<Guid>();
 
         /// <summary>
         /// 创建 <see cref="SherlockServicesBuilder"/> 类的新实例。

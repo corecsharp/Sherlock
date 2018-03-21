@@ -18,7 +18,9 @@ namespace Sherlock.Framework
         private string _version;
         private string _systemName;
         private string _groupName;
-        private static readonly Regex NamePattern = new Regex(@"^[a-z0-9A-Z_-]+$");
+        private static readonly Regex GroupNamePattern = new Regex(@"^[a-z0-9]+$");
+        private static readonly Regex AppSystemNameNamePattern = new Regex(@"^[a-z0-9-]+$");
+
 
         public SherlockOptions()
         {
@@ -47,9 +49,9 @@ namespace Sherlock.Framework
                         throw new ArgumentNullException("应用程序系统名称不能为空。");
                     }
                     string valueString = value.Trim();
-                    if (!NamePattern.IsMatch(valueString))
+                    if (!GroupNamePattern.IsMatch(valueString))
                     {
-                        throw new ArgumentException($"应用组织名称中不能包含非法字符（只能包含字母、数字、下划线、减号）。");
+                        throw new ArgumentException($"应用组织名称中不能包含非法字符（只能包含小写字母，数字）。");
                     }
 
                     _groupName = valueString;
@@ -59,7 +61,7 @@ namespace Sherlock.Framework
 
         /// <summary>
         /// 应用程序系统名称（默认为 "UnnamedApp"）。
-        /// </summary>
+        /// </summary> 
         public string AppSystemName
         {
             get { return _systemName.IfNullOrWhiteSpace("UnnamedApp"); }
@@ -76,9 +78,9 @@ namespace Sherlock.Framework
                         throw new ArgumentNullException("应用程序系统名称不能为空。");
                     }
                     string valueString = value.Trim();
-                    if (!NamePattern.IsMatch(valueString))
+                    if (!AppSystemNameNamePattern.IsMatch(valueString))
                     {
-                        throw new ArgumentException($"应用程序系统名称中不能包含非法字符（只能包含字母、数字、下划线）。");
+                        throw new ArgumentException($"应用程序系统名称中不能包含非法字符（只能包含小写字母，数字，减号）。");
                     }
 
                     _systemName = valueString;
@@ -110,11 +112,11 @@ namespace Sherlock.Framework
         }
 
         /// <summary>
-        ///获取或设置网站默认时区（默认: windows: China Standard Time, linux: Asia/Shanghai，即中国北京时间）。
+        ///获取或设置网站默认时区（默认: Asia/Shanghai，即中国北京时间）。
         /// </summary>
         public string DefaultTimeZone
         {
-            get { return _defaultTimeZone.IfNullOrWhiteSpace(SystemHelper.GetChinaTimeZoneIdByCurrentSys()); }
+            get { return _defaultTimeZone.IfNullOrWhiteSpace("Asia/Shanghai"); }
             set { _defaultTimeZone = value; }
         }
 

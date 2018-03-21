@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Sherlock.Framework;
 using Sherlock.Framework.Caching;
-using Sherlock.Framework.Components;
 using Sherlock.Framework.DependencyInjection;
 using Sherlock.Framework.Environment;
 using Sherlock.Framework.Environment.ShellBuilders;
@@ -104,20 +103,21 @@ namespace Sherlock
 
         private static void InitShell(SherlockServicesBuilder SherlockBuilder, Action<ShellCreationScope> setup)
         {
+            ShellCreationScope shellScope = new ShellCreationScope();
+            setup?.Invoke(shellScope);
 
             var builder = SherlockBuilder.ServiceCollection.FillToOther();
             builder.AddSmart(SherlockServices.GetServices(SherlockBuilder.Configuration));
+            builder.AddLogging(lb =>
+            {
+                shellScope.LoggingConfigure?.Invoke(lb);
+            });
 
             var scopeFactory = builder.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>();
             using (IServiceScope scope = scopeFactory.CreateScope())
             {
                 IServiceProvider provider = scope.ServiceProvider;
-
-                ShellCreationScope shellScope = new ShellCreationScope(provider);
-                setup?.Invoke(shellScope);
-                LogLevel level = SherlockUtility.InVisualStudio() ? LogLevel.Trace : LogLevel.Information;
-                shellScope.LoggerFactory.AddConsole((n, l) => l >= level && n.StartsWith("Sherlock"));
-                var shellLogger = shellScope.LoggerFactory.CreateLogger("Sherlock");
+                var shellLogger =provider.GetRequiredService<ILoggerFactory>().CreateLogger("Sherlock");
 
                 shellLogger.WriteInformation("开始加载 Shell。");
 
@@ -127,6 +127,10 @@ namespace Sherlock
                 var context = factory.CreateShellContext();
 
                 AddConfiguredOptions(SherlockBuilder.ServiceCollection, SherlockBuilder.Configuration, context);
+
+                //微软框架依然存在解决日志组件创建后的销毁问题，只能通过移除日志来达到清理目的。
+                SherlockBuilder.ServiceCollection.Remove(sd => sd.ServiceType.Equals(typeof(ILoggerFactory)));
+                SherlockBuilder.ServiceCollection.AddLogging(b => b.AddConfiguration(SherlockBuilder.Configuration.GetSection("Logging")));
 
                 SherlockBuilder.ServiceCollection.AddSingleton(context);
                 SherlockBuilder.ServiceCollection.AddSmart(context.Services);
@@ -153,7 +157,7 @@ namespace Sherlock
  ________  ________  ___  ___  ___  ___  ________  _______   ________  _________   
 |\   ____\|\   ____\|\  \|\  \|\  \|\  \|\   __  \|\  ___ \ |\   __  \|\___   ___\ 
 \ \  \___|\ \  \___|\ \  \\\  \ \  \\\  \ \  \|\ /\ \   __/|\ \  \|\  \|___ \  \_| 
- \ \_____  \ \  \    \ \\  __  \ \  \\\  \ \   __  \ \  \_|/_\ \   _  _\   \ \  \  
+ \ \_____  \ \  \    \ \   __  \ \  \\\  \ \   __  \ \  \_|/_\ \   _  _\   \ \  \  
   \|____|\  \ \  \____\ \  \ \  \ \  \\\  \ \  \|\  \ \  \_|\ \ \  \\  \|   \ \  \ 
     ____\_\  \ \_______\ \__\ \__\ \_______\ \_______\ \_______\ \__\\ _\    \ \__\
    |\_________\|_______|\|__|\|__|\|_______|\|_______|\|_______|\|__|\|__|    \|__|
@@ -165,13 +169,13 @@ namespace Sherlock
                 info.AppendLine((new Tuple<int, int, int, int, String>[] { table }).ToStringTable(new String[] { "modules", "controllers", "dependencies", "describers", "moduleList" },
                     t => t.Item1, t => t.Item2, t => t.Item3, t => t.Item4, t => t.Item5));
                 info.AppendLine("   ");
-                //info.Append(context.Blueprint.Dependencies.GroupBy(d => d.Feature.Descriptor.ModuleName, d => (ShellBlueprintDependencyItem)d).ToStringTable(
-                //    new string[] { "module", "dependencies", "internfaces", "lifetime" },
-                //    f => f.Key,
-                //    d => d.SelectMany(t => CreateArray(t.Type.Name, t.Interfaces.Count)).ToArrayString(System.Environment.NewLine),
-                //    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item1.Name).ToArrayString(System.Environment.NewLine),
-                //    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item2.ToString().ToLower()).ToArrayString(System.Environment.NewLine)));
-                //info.AppendLine("   ");
+                info.Append(context.Blueprint.Dependencies.GroupBy(d => d.Feature.Descriptor.ModuleName, d => (ShellBlueprintDependencyItem)d).ToStringTable(
+                    new string[] { "module", "dependencies", "internfaces", "lifetime" },
+                    f => f.Key,
+                    d => d.SelectMany(t => CreateArray(t.Type.Name, t.Interfaces.Count)).ToArrayString(System.Environment.NewLine),
+                    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item1.Name).ToArrayString(System.Environment.NewLine),
+                    d => d.SelectMany(t => t.Interfaces).Select(i => i.Item2.ToString().ToLower()).ToArrayString(System.Environment.NewLine)));
+                info.AppendLine("   ");
 
                 shellLogger.WriteInformation(info.ToString());
             }
@@ -202,18 +206,6 @@ namespace Sherlock
         }
 
         /// <summary>
-        /// 配置使用乐观并发方式的唯一 Id 生成器。
-        /// </summary>
-        /// <param name="collection"></param>
-        /// <param name="setupAction"></param>
-        [Obsolete("use 'Sherlock.Framework.Services.IIdGenerationService' instead")]
-        public static void AddOptimisticUniqueIdOptions(this SherlockServicesBuilder collection, Action<OptimisticUniqueIdOptions> setupAction)
-        {
-            collection.ServiceCollection.AddSmart(ServiceDescriber.Singleton<IUniqueIdGenerator, OptimisticUniqueIdGenerator>());
-            collection.ServiceCollection.Configure(setupAction);
-        }
-
-        /// <summary>
         /// 使用 Sherlock 提供的缓存来实现 asp.net 框架中的缓存（<see cref="IDistributedCache"/>）提供程序。
         /// </summary>
         /// <param name="collection"></param>
@@ -224,7 +216,8 @@ namespace Sherlock
             {
                 var manager = serviceProvider.GetRequiredService<ICacheManager>();
                 return new DistributedCacheAdapter(manager, regionName);
-            }, ServiceLifetime.Transient));
+            }, ServiceLifetime.Transient)
+            { Options = SmartOptions.TryAdd });
         }
 
         /// <summary>

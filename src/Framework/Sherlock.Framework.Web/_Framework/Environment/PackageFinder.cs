@@ -18,6 +18,7 @@ namespace Sherlock.Framework.Environment.Modules.Finders
         private ILogger _logger;
         private IAssemblyReader _reader;
         private const string ProjectReferenceType = "ProjectReference";
+        private const string AssemblyNameElement = "AssemblyName";
 
         public PackageFinder(
             IAssemblyReader assemblyReader,
@@ -55,9 +56,6 @@ namespace Sherlock.Framework.Environment.Modules.Finders
         private IEnumerable<KeyValuePair<String, String>> GetPackageFolders()
         {
             string currentFolder = Directory.GetCurrentDirectory();
-            var compileLibraries = DependencyContext.Default.CompileLibraries.Where(l => 
-            !l.Name.StartsWith("microsoft", StringComparison.OrdinalIgnoreCase) && !l.Name.StartsWith("system", StringComparison.OrdinalIgnoreCase)).ToArray();
-
             if (SherlockUtility.InVisualStudio())
             {
                 var files = Directory.EnumerateFiles(currentFolder, "*.csproj", SearchOption.TopDirectoryOnly);
@@ -72,9 +70,12 @@ namespace Sherlock.Framework.Environment.Modules.Finders
                         String include = project.Include;
                         
                         String fullPath = Path.IsPathRooted(project.Include) ? project.Include : SherlockUtility.CombinePath(currentFolder, include);
-                        String dir = Path.GetDirectoryName(fullPath);
-                        var lib = compileLibraries.FirstOrDefault(l => l.Name.CaseInsensitiveEquals(Path.GetFileNameWithoutExtension(include)));
-                        yield return new KeyValuePair<string, string>(dir, lib.ResolveReferencePaths().First());
+                        var proj = ProjectRootElement.Open(fullPath);
+                       
+                        ProjectPropertyElement[] projectProperties = proj.PropertyGroups.SelectMany(gp => gp.Children.OfType<ProjectPropertyElement>()).ToArray();
+                        var assemblyName = projectProperties.Where(p => p.Name.Equals("AssemblyName")).Select(p => p.Value).FirstOrDefault();
+                        string path = assemblyName.IfNullOrWhiteSpace(Path.GetFileNameWithoutExtension(proj.FullPath));
+                        yield return new KeyValuePair<string, string>(proj.DirectoryPath, path);
                     }
                 }
             }

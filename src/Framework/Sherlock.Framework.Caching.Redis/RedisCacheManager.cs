@@ -108,17 +108,17 @@ namespace Sherlock.Framework.Caching
         private String _defaultRegion = null;
 
         public RedisCacheManager(
-            IOptions<SherlockOptions> sherlockOptions,
+            IOptions<SherlockOptions> SherlockOptions,
             IOptions<SherlockRedisOptions> redisOptions,
             IEnumerable<IRedisCacheSerializer> serializers = null,
             ILoggerFactory loggerFactory = null)
         {
-            Guard.ArgumentNotNull(sherlockOptions, nameof(sherlockOptions));
+            Guard.ArgumentNotNull(SherlockOptions, nameof(SherlockOptions));
             Guard.ArgumentNotNull(redisOptions, nameof(redisOptions));
             _connection = new Lazy<ConnectionMultiplexer>(this.CreateConnection, true);
             _logger = loggerFactory?.CreateLogger<RedisCacheManager>() ?? (ILogger)NullLogger.Instance;
             _options = redisOptions.Value;
-            _defaultRegion = $"{sherlockOptions.Value.Group}{RegionSpliterChar}{ sherlockOptions.Value.AppSystemName}";
+            _defaultRegion = $"{SherlockOptions.Value.Group}{RegionSpliterChar}{ SherlockOptions.Value.AppSystemName}";
             _redisCacheSerializers = serializers?.ToDictionary(s => s.Name, s => s, StringComparer.OrdinalIgnoreCase);
             if (_redisCacheSerializers.IsNullOrEmpty())
             {
@@ -204,14 +204,14 @@ namespace Sherlock.Framework.Caching
                     if (_backCache == null)
                     {
                         _backCache = new MemoryCacheManager(new OptionsManager<MemoryCacheOptions>(
+                            new OptionsFactory<MemoryCacheOptions>(
                             new IConfigureOptions<MemoryCacheOptions>[]
                             {
                                 new ConfigureOptions<MemoryCacheOptions>(o=>
                                 {
                                     o.ExpirationScanFrequency = TimeSpan.FromMinutes(1);
-                                    o.CompactOnMemoryPressure = true;
                                 })
-                            }));
+                            }, Enumerable.Empty<IPostConfigureOptions<MemoryCacheOptions>>())));
                     }
                 }
             }
@@ -642,8 +642,8 @@ namespace Sherlock.Framework.Caching
                 catch (Exception ex)
                 {
                     var oex = ex.GetOriginalException();
-                    _logger.WriteWarning($@"Redies 获取对象时发生反序列错误，可能由于数据结构变化，类型 {type.Name}。",
-                                            new
+                    _logger.WriteWarning(0, $@"Redies 获取对象时发生反序列错误，可能由于数据结构变化，类型 {type.Name}。",
+                                            extensions: new
                                             {
                                                 RedisKey = key,
                                                 RawValue = Encoding.UTF8.GetString(data),

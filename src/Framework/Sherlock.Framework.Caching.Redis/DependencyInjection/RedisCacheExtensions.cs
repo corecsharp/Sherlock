@@ -10,6 +10,8 @@ namespace Sherlock
 {
     public static class RedisCacheExtensions
     {
+        private static Guid _module = Guid.NewGuid();
+
         /// <summary>
         /// 使用 Redis 缓存服务（将以 Redis 缓存实现 <see cref="ICacheManager"/> 接口，默认连接配置节为 Sherlock:Redis。）。
         /// </summary>
@@ -32,7 +34,10 @@ namespace Sherlock
             }
             
             builder.ServiceCollection.AddSmart(ServiceDescriber.Singleton<ICacheManager, RedisCacheManager>(SmartOptions.Replace));
-            builder.ServiceCollection.AddSmart(ServiceDescriber.Singleton<IRedisCacheSerializer, JsonNetSerializer>(SmartOptions.Append));
+            if (builder.AddedModules.Add(_module))
+            {
+                builder.ServiceCollection.AddSmart(ServiceDescriber.Singleton<IRedisCacheSerializer, JsonNetSerializer>(SmartOptions.Append));
+            }
 
             if (options.ConnectionString.IsNullOrWhiteSpace())
             {

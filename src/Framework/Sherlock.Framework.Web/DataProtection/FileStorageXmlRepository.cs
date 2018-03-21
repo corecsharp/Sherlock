@@ -131,8 +131,8 @@ namespace Sherlock.Framework.Web.DataProtection
                         using (var stream = creation.OpenWriteStreamAsync().GetAwaiter().GetResult())
                         {
                             element.Save(stream);
-                            creation.SaveChangesAsync().GetAwaiter().GetResult();
                         }
+                        creation.SaveChangesAsync().GetAwaiter().GetResult();
                         _logger.WriteDebug($"已写入 Key 文件（{filename}）。");
                     }
                     else

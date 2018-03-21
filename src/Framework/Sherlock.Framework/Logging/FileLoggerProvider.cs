@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sherlock.Framework.FileSystem.AppData;
 using System;
 using System.Collections.Generic;
@@ -7,16 +8,29 @@ using System.Threading.Tasks;
 
 namespace Sherlock.Framework.Logging
 {
+    [ProviderAlias("File")]
     public class FileLoggerProvider : ILoggerProvider
     {
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly string _folder;
         private int _backlogSize;
-        public FileLoggerProvider(string folderName = "logs", Func<string, LogLevel, bool> filter= null, int backlogSize = 10 * 1024)
+
+        private static readonly Func<string, LogLevel, bool> TrueFilter = (cat, level) => true;
+        private static readonly Func<string, LogLevel, bool> FalseFilter = (cat, level) => false;
+
+        public FileLoggerProvider(string folderName, Func<string, LogLevel, bool> filter= null, int backlogSize = 10 * 1024)
         {
-            this._filter = filter;
+            this._filter = filter ?? TrueFilter;
             this._folder = folderName.IfNullOrWhiteSpace("logs");
-            this._backlogSize = backlogSize;
+            this._backlogSize = Math.Max(4, backlogSize);
+        }
+        
+        public FileLoggerProvider(IOptions<FileLoggerOptions> options)
+        {
+            Guard.ArgumentNotNull(options, nameof(options));
+            _filter = TrueFilter;
+            _folder = options.Value.Folder.IfNullOrWhiteSpace("logs");
+            _backlogSize = Math.Max(4, options.Value.BacklogSizeKB);
         }
 
         public ILogger CreateLogger(string name)

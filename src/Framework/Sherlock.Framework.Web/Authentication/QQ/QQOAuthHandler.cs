@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -17,8 +18,9 @@ namespace Sherlock.Framework.Web.Authentication.QQ
     internal class QQOAuthHandler : OAuthHandler<QQOAuthOptions>
     {
         private const string _regexSEQuery = @"(?<=(\&|\?|^)({0})\=).*?(?=\&|$)";
+        
 
-        public QQOAuthHandler(HttpClient backchannel) : base(backchannel)
+        public QQOAuthHandler(IOptionsMonitor<QQOAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
 
@@ -97,28 +99,29 @@ namespace Sherlock.Framework.Web.Authentication.QQ
             user["openid"] = openId;
             return user;
         }
-        
+
         protected override async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, OAuthTokenResponse tokens)
         {
             string openId = await RequestQQOpenIdAsync(tokens);
             JObject user = await this.RequestQQUserInfo(openId, tokens);
-
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), properties, Options.AuthenticationScheme);
-            OAuthCreatingTicketContext context = new OAuthCreatingTicketContext(ticket, this.Context, this.Options, this.Backchannel, tokens, user);
-
+            
             if (!QQHelper.HasError(user))
             {
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, QQHelper.GetId(user), ClaimValueTypes.String, this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim("urn:qqaccount:openid", QQHelper.GetId(user), ClaimValueTypes.String, this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim(ClaimTypes.Name, QQHelper.GetNickName(user), this.Options.AuthenticationScheme));
-                identity.AddClaim(new Claim(ClaimTypes.Gender, QQHelper.GetGender(user), this.Options.AuthenticationScheme));
-               
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, QQHelper.GetId(user), ClaimValueTypes.String));
+                identity.AddClaim(new Claim("urn:qqaccount:openid", QQHelper.GetId(user), ClaimValueTypes.String));
+                identity.AddClaim(new Claim(ClaimTypes.Name, QQHelper.GetNickName(user)));
+                identity.AddClaim(new Claim(ClaimTypes.Gender, QQHelper.GetGender(user)));
+
                 //identity.AddClaim(new Claim(ClaimTypes.Email, $"{QQHelper.GetId(user)}@qq.com", this.Options.AuthenticationScheme));
             }
-            
-            await this.Options.Events.CreatingTicket(context);
 
-            return context.Ticket;
+            OAuthCreatingTicketContext context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity), properties, this.Context, this.Scheme, this.Options, this.Backchannel, tokens, user);
+
+            context.RunClaimActions();
+
+            await Events.CreatingTicket(context);
+
+            return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
 
 

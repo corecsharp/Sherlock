@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sherlock.Framework.Caching;
-using Sherlock.Framework.Components;
 using Sherlock.Framework.Data;
 using Sherlock.Framework.Environment;
 using Sherlock.Framework.Environment.Modules;
@@ -41,10 +40,9 @@ namespace Sherlock.Framework.DependencyInjection
             yield return ServiceDescriber.Singleton<IInstanceIdProvider, DefaultInstanceIdProvider>();
             string configValue = configuration["Sherlock:Env"];
             yield return ServiceDescriber.Transient<ISherlockEnvironment>(s => 
-            new DefaultRuntimeEnvironment(configValue ?? "Unknown", s.GetService<IFrameworkNameProvider>(), s.GetRequiredService<IInstanceIdProvider>()));
+            new DefaultRuntimeEnvironment(configValue ?? "Production", s.GetRequiredService<IInstanceIdProvider>()));
             
             //系统内置服务
-            yield return ServiceDescriber.Singleton<ILoggerFactory, LoggerFactory>();
             yield return ServiceDescriber.Singleton<ICacheManager, MemoryCacheManager>();
 
             //事件通知
@@ -60,7 +58,6 @@ namespace Sherlock.Framework.DependencyInjection
             yield return ServiceDescriber.Transient<IShellDescriptorManager, NullShellDescriptorManager>();
             yield return ServiceDescriber.Transient<IAssemblyReader, DefaultAssemblyReader>();
             yield return ServiceDescriber.Transient<IPathProvider, DefaultPathProvider>();
-            yield return ServiceDescriber.Transient<IFrameworkNameProvider, DefaultFrameworkNameProvider>();
 
             yield return ServiceDescriber.Singleton<IWorkContextAccessor, DefaultWorkContextAccessor>();
             yield return ServiceDescriber.Scoped<WorkContext>(sp=>sp.GetRequiredService<IWorkContextAccessor>().GetContext());
@@ -71,10 +68,12 @@ namespace Sherlock.Framework.DependencyInjection
 
             //模块化功能
             yield return ServiceDescriber.Transient<IModuleHarvester, XmlHarvester>(SmartOptions.Append); // IModuleHarvester 可以存在多个实例
-            yield return ServiceDescriber.Transient<IModuleHarvester, JsonHarvester>(SmartOptions.Append); 
+            yield return ServiceDescriber.Transient<IModuleHarvester, JsonHarvester>(SmartOptions.Append);
 
+            yield return ServiceDescriber.Transient<IModuleFinder, EntryPointFinder>(SmartOptions.Append);
             yield return ServiceDescriber.Transient<IModuleFinder, RunningFolderFinder>(SmartOptions.Append);
             yield return ServiceDescriber.Transient<IModuleLoader, ClrModuleLoader>(SmartOptions.Append);  //该服务可以存在多个实例
+
             yield return ServiceDescriber.Transient<IShellDescriptorCache, NullShellDescriptorCache>();
             yield return ServiceDescriber.Transient<IModuleManager, ModuleManager>(); 
             yield return ServiceDescriber.Transient<IFeatureManager, FeatureManager>();
@@ -91,7 +90,7 @@ namespace Sherlock.Framework.DependencyInjection
             yield return ServiceDescriber.Transient<IShellContextFactory, ShellContextFactory>();
 
             //全球化
-            yield return ServiceDescriber.Scoped<ILocalizedStringManager, LocalizedStringManager>();
+            yield return ServiceDescriber.Singleton<ILocalizedStringManager, LocalizedStringManager>();
 
             yield return ServiceDescriber.Scoped<IPermissionService, NullPermissionService>();
             yield return ServiceDescriber.Scoped<ILanguageService, NullLanguageService>();

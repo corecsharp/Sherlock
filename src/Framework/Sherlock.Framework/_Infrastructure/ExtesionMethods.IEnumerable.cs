@@ -28,7 +28,7 @@ namespace System
 {
     static partial class ExtensionMethods
     {
-
+        
         #region TableString
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace System
                 {
                     // Print cell
                     string cell = arrValues[rowIndex, colIndex];
-                    string[] splitedValues = cell.Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] splitedValues =  cell.Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     cell = (splitedValues.Length > i) ? splitedValues[i] : " ";
                     cell = cell.PadRight(maxColumnsWidth[colIndex]);
                     sb.Append(" | ");
@@ -122,7 +122,7 @@ namespace System
                 {
                     int newLenght = arrValues[rowIndex, colIndex].Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Length;
                     maxRowHeight[rowIndex] = Math.Max(maxRowHeight[rowIndex], newLenght);
-                }
+                } 
             }
             return maxRowHeight;
         }
@@ -135,7 +135,7 @@ namespace System
                 for (int rowIndex = 0; rowIndex < arrValues.GetLength(0); rowIndex++)
                 {
                     var values = arrValues[rowIndex, colIndex].Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-                    int newLength = values.Length == 0 ? 0 : values.Max(s => s?.Length ?? 0);
+                    int newLength = values.Length == 0 ? 0: values.Max(s=>s?.Length ?? 0);
                     int oldLength = maxColumnsWidth[colIndex];
 
                     maxColumnsWidth[colIndex] = Math.Max(newLength, oldLength);
@@ -168,7 +168,7 @@ namespace System
             }
             return null;
         }
-
+        
         #endregion
 
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable)

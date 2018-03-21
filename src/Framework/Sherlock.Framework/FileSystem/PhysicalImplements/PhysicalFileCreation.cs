@@ -11,17 +11,14 @@ namespace Sherlock.Framework.FileSystem
         private string _tempFilePath = null;
         private string _relativePath = null;
         private string _scope = null;
-        private IFilePathRouter _router = null;
-        private IFileUrlProvider _urlProvider = null;
+        private IFileRequestMapping _fileMapping = null;
 
-        internal PhysicalFileCreation(string scope, string filePath, IFilePathRouter router, IFileUrlProvider fileUrlProvider)
+        internal PhysicalFileCreation(string scope, string filePath,IFileRequestMapping fileRequestMapping)
         {
-            Guard.ArgumentNotNull(fileUrlProvider, nameof(fileUrlProvider));
+            Guard.ArgumentNotNull(fileRequestMapping, nameof(fileRequestMapping));
             Guard.ArgumentIsRelativePath(filePath, nameof(filePath));
-            Guard.ArgumentNotNull(router, nameof(router));
 
-            _router = router;
-            _urlProvider = fileUrlProvider;
+            _fileMapping = fileRequestMapping;
             _scope = scope;
             _relativePath = filePath;
             _tempFilePath = Path.GetTempFileName();
@@ -39,19 +36,20 @@ namespace Sherlock.Framework.FileSystem
             {
                 Directory.CreateDirectory(directory);
             }
+            
             return Task.FromResult<Stream>(File.OpenWrite(_tempFilePath));
         }
 
         public Task<IFile> SaveChangesAsync()
         {
-            string fullPath = _router.GetFilePath(_relativePath, _scope);
+            string fullPath = _fileMapping.GetFilePath(_relativePath, _scope);
             string directory = Path.GetDirectoryName(fullPath);
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
             File.Copy(_tempFilePath, fullPath, true);
-            return Task.FromResult<IFile>(new PhysicalFile(_scope, _relativePath, _router, _urlProvider));
+            return Task.FromResult<IFile>(new PhysicalFile(_scope, _relativePath, _fileMapping));
         }
     }
 }

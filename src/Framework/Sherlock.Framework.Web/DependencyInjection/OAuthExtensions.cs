@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Sherlock.Framework.Web.Authentication;
 using Sherlock.Framework.Web.Authentication.QQ;
 using Sherlock.Framework.Web.Authentication.Wechat;
 using Sherlock.Framework.Web.Authentication.Weibo;
+using Sherlock.Framework.Web.DependencyInjection;
 using System;
 using System.ComponentModel;
 
@@ -19,14 +18,12 @@ namespace Sherlock
         /// <param name="app"></param>
         /// <param name="configureOptions"></param>
         /// <returns></returns>
-        public static AuthenticationBuilder UseQQAuthentication(this AuthenticationBuilder app, Action<QQOAuthOptions> configureOptions = null)
+        public static SherlockWebBuilder AddQQSignIn(this SherlockWebBuilder app, Action<QQOAuthOptions> configureOptions = null)
         {
             QQOAuthOptions options = new QQOAuthOptions();
-            if (configureOptions != null)
-            {
-                configureOptions(options);
-            }
-            return app.UseOAuthMiddleware<QQOAuthMiddleware, QQOAuthOptions>(options);
+            configureOptions?.Invoke(options);
+            return app.ConfigureServices(s => 
+            s.AddAuthentication().AddOAuth<QQOAuthOptions, QQOAuthHandler>(QQDefaults.AuthenticationScheme, QQDefaults.DisplayName, configureOptions));
         }
 
         /// <summary>
@@ -35,14 +32,11 @@ namespace Sherlock
         /// <param name="app"></param>
         /// <param name="configureOptions"></param>
         /// <returns></returns>
-        public static AuthenticationBuilder UseWeiboAuthentication(this AuthenticationBuilder app, Action<WeiboOAuthOptions> configureOptions = null)
+        public static SherlockWebBuilder AddWeiboSignIn(this SherlockWebBuilder app, Action<WeiboOAuthOptions> configureOptions = null)
         {
             WeiboOAuthOptions options = new WeiboOAuthOptions();
-            if (configureOptions != null)
-            {
-                configureOptions(options);
-            }
-            return app.UseOAuthMiddleware<WeiboOAuthMiddleware, WeiboOAuthOptions>(options);
+            configureOptions?.Invoke(options);
+            return  app.ConfigureServices(s => s.AddAuthentication().AddOAuth<WeiboOAuthOptions, WeiboOAuthHandler>(WeiboDefaults.AuthenticationScheme, WeiboDefaults.DisplayName, configureOptions));
         }
 
         /// <summary>
@@ -51,14 +45,11 @@ namespace Sherlock
         /// <param name="app"></param>
         /// <param name="configureOptions"></param>
         /// <returns></returns>
-        public static AuthenticationBuilder UseWeChatAuthentication(this AuthenticationBuilder app, Action<WeChatOptions> configureOptions = null)
+        public static SherlockWebBuilder AddWeChatSignIn(this SherlockWebBuilder app, Action<WeChatOptions> configureOptions = null)
         {
             WeChatOptions options = new WeChatOptions();
-            if (configureOptions != null)
-            {
-                configureOptions(options);
-            }
-            return app.UseOAuthMiddleware<WeChatOAuthMiddleware, WeChatOptions>(options);
+            configureOptions?.Invoke(options);
+            return app.ConfigureServices(s => s.AddAuthentication().AddOAuth<WeChatOptions, WeChatOAuthHandler>(WeiboDefaults.AuthenticationScheme, WechatDefaults.DisplayName, configureOptions));
         }
     }
 }

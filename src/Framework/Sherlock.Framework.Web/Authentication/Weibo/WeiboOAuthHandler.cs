@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -10,12 +9,14 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using System.Text.Encodings.Web;
 
 namespace Sherlock.Framework.Web.Authentication.Weibo
 {
     internal class WeiboOAuthHandler : OAuthHandler<WeiboOAuthOptions>
     {
-        public WeiboOAuthHandler(HttpClient backchannel) : base(backchannel)
+        public WeiboOAuthHandler(IOptionsMonitor<WeiboOAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
 
@@ -51,14 +52,18 @@ namespace Sherlock.Framework.Web.Authentication.Weibo
         {
             JObject user = await this.RequestWeiboUidAsync(tokens);
 
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), properties, this.Options.AuthenticationScheme);
-            OAuthCreatingTicketContext context = new OAuthCreatingTicketContext(ticket, this.Context, this.Options, this.Backchannel, tokens, user);
-            
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, WeiboHelper.GetId(user), ClaimValueTypes.String, this.Options.AuthenticationScheme));
+
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, WeiboHelper.GetId(user), ClaimValueTypes.String));
+
+            OAuthCreatingTicketContext context = new OAuthCreatingTicketContext(new ClaimsPrincipal(identity),
+                properties, this.Context, this.Scheme, this.Options, this.Backchannel, tokens, user);
             
             await this.Options.Events.CreatingTicket(context);
+            context.RunClaimActions();
 
-            return context.Ticket;
+            await Events.CreatingTicket(context);
+
+            return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
 
 
