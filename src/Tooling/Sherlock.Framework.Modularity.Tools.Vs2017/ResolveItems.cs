@@ -9,9 +9,10 @@
     class ResolveItems
     {
         private const string ProjectReferenceType = "ProjectReference";
-        internal static IEnumerable<KeyValuePair<string, string>> GetProject()
+        internal static IEnumerable<KeyValuePair<string, string>> GetProject(string currentFloder = null)
         {
-            string currentFolder = Directory.GetCurrentDirectory();
+            string currentFolder = currentFloder??Directory.GetCurrentDirectory();
+            Console.WriteLine("Current Folder:" + currentFolder);
 
             Console.WriteLine($"{nameof(currentFolder)}:{currentFolder}");
             var files = Directory.EnumerateFiles(currentFolder, "*.csproj", SearchOption.TopDirectoryOnly);

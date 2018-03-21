@@ -12,7 +12,6 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyOriginatorKeyFile>..\..\..\assembly.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <AssetTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>

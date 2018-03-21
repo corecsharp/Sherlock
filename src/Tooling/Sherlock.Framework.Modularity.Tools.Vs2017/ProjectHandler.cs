@@ -18,10 +18,10 @@ namespace Sherlock.Framework.Modularity.Tools.Vs2017
         {
             this._projectFilePath = projectFilePath;
             this._projectFilePaths = new List<string>();
-            //this._projectFilePaths.Add(projectFilePath);
+            this._projectFilePaths.Add(projectFilePath);
         }
 
-        public List<ProjectInfo> GetProjectFiles()
+        public List<ProjectFileInfo> GetProjectFiles()
         {
             var dir = Path.GetDirectoryName(this._projectFilePath);
             var fileName = Path.GetFileName(this._projectFilePath);
@@ -31,12 +31,12 @@ namespace Sherlock.Framework.Modularity.Tools.Vs2017
             var result = this._projectFilePaths
                 .Select(x => Path.GetFullPath(x))
                 .Distinct()
-                .Select(x => new ProjectInfo(x))
+                .Select(x => new ProjectFileInfo(x))
                 .ToList();
             return result;
         }
 
-        private IEnumerable<string> GetAllProjectFile(string baseDir, IEnumerable<string> paths, bool isRoot = false)
+        private IEnumerable<string> GetAllProjectFile(string baseDir, IEnumerable<string> paths)
         {
             if (!paths.Any())
             {
@@ -49,9 +49,8 @@ namespace Sherlock.Framework.Modularity.Tools.Vs2017
                 var relPaths = this.GetProjectFileRefrence(fullPath);
                 var fs = relPaths.Select(x => Path.Combine(Path.GetDirectoryName(fullPath), x));
                 this._projectFilePaths.AddRange(fs);
-                return fs;
-                //不需要递归引用，框架已要求显式引用
-                //return this.GetAllProjectFile(Path.GetDirectoryName(fullPath), relPaths);
+
+                return this.GetAllProjectFile(Path.GetDirectoryName(fullPath), relPaths);
             }
             return Enumerable.Empty<string>();
         }

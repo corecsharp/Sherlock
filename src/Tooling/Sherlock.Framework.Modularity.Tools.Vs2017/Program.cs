@@ -2,16 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     class Program
     {
         private const string DestDirectoryName = "Modules";
-        private static int _copyCount;
 
         //modular --c xxx.csproj --d xx/publish/
         // CLI: dotnet modularity --config $(MSBuildProjectFullPath) --dest $(publishUrl)
@@ -31,8 +27,8 @@
             Console.WriteLine();
 
             var handler = new ProjectHandler(projectFilePath);
-            List<ProjectInfo> files = handler.GetProjectFiles();
-            List<KeyValuePair<ProjectInfo, string>> sourceFiles = GetCopyFiles(files);
+            List<ProjectFileInfo> files = handler.GetProjectFiles();
+            List<KeyValuePair<ProjectFileInfo, string>> sourceFiles = GetCopyFiles(files);
             CopyFile(sourceFiles, dest);
             Console.WriteLine("Finish");
 
@@ -73,68 +69,53 @@
             return new Tuple<string, string>(projectFilePath, dest);
         }
 
-        static List<KeyValuePair<ProjectInfo, string>> GetCopyFiles(IEnumerable<ProjectInfo> projectFile)
+        static List<KeyValuePair<ProjectFileInfo, string>> GetCopyFiles(IEnumerable<ProjectFileInfo> projectFile)
         {
             var result = projectFile
                 .Select(
                     x => new
                     {
-                        Files = x.EnumerateContentFiles(),
+                        Files = Directory.EnumerateFiles(x.ProjectPath, "*.*", SearchOption.AllDirectories),
                         Project = x
                     });
-            var files = new List<KeyValuePair<ProjectInfo, string>>();
+            var files = new List<KeyValuePair<ProjectFileInfo, string>>();
             foreach (var project in result)
             {
-                var projectFiles = project.Files.Where(x => IsSearchFile(project.Project.ProjectFolder, x)).Select(x => new KeyValuePair<ProjectInfo, string>(project.Project, x));
-                files.AddRange(projectFiles);
+                {
+                    var projectFiles = project.Files.Where(x => IsSearchFile(project.Project.ProjectPath, x)).Select(x => new KeyValuePair<ProjectFileInfo, string>(project.Project, x));
+                    files.AddRange(projectFiles);
+                }
             }
 
             foreach (var file in files)
             {
-                Console.WriteLine($"[{file.Key.ProjectName}] : {file.Value}");
+                Console.WriteLine($"Found in Project {file.Key.ProjectName} file : {file.Value}");
             }
 
             return files;
         }
 
-        static void CopyFile(List<KeyValuePair<ProjectInfo, string>> projectFile, string dest)
+        static void CopyFile(List<KeyValuePair<ProjectFileInfo, string>> projectFile, string dest)
         {
             string destRoot = Path.Combine(dest, DestDirectoryName);
             if (Directory.Exists(destRoot))
             {
                 Directory.Delete(destRoot, true);
             }
-            _copyCount = 0;
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            object locked = new object();
 
             try
             {
-                Parallel.ForEach(projectFile, keyValuePair =>
+                foreach (KeyValuePair<ProjectFileInfo, string> keyValuePair in projectFile)
                 {
                     var destFolder = Path.Combine(destRoot, keyValuePair.Key.ProjectName);
-                    var destPath = keyValuePair.Value.Replace(keyValuePair.Key.ProjectFolder, destFolder);
+                    var destPath = keyValuePair.Value.Replace(keyValuePair.Key.ProjectPath, destFolder);
                     Console.WriteLine($"Sherlock modulary : deploy dependency file {destPath}");
                     if (!Directory.Exists(Path.GetDirectoryName(destPath)))
                     {
-                        lock (locked)
-                        {
-                            if (!Directory.Exists(Path.GetDirectoryName(destPath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
-                            }
-                        }
+                        Directory.CreateDirectory(Path.GetDirectoryName(destPath));
                     }
                     File.Copy(keyValuePair.Value, destPath, true);
-
-                    Interlocked.Increment(ref _copyCount);
-                });
-
-                sw.Stop();
-                Console.WriteLine($"Sherlock modulary completed : {_copyCount} files in {sw.ElapsedMilliseconds} ms");
+                }
             }
             catch (Exception e)
             {
@@ -156,7 +137,6 @@
 
             string objFolder = Path.Combine(rootFolder, "obj");
             string binFolder = Path.Combine(rootFolder, "bin");
-
             bool isExcepted = filePath.StartsWith(objFolder, StringComparison.OrdinalIgnoreCase) ||
                 filePath.StartsWith(binFolder, StringComparison.OrdinalIgnoreCase) ||
                 fileName.Equals("project.json", StringComparison.OrdinalIgnoreCase) ||
