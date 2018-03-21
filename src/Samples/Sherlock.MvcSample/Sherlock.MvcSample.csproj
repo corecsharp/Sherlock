@@ -19,8 +19,11 @@
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web.Dapper\Sherlock.Framework.Web.Dapper.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework.Web\Sherlock.Framework.Web.csproj" />
     <ProjectReference Include="..\..\Framework\Sherlock.Framework\Sherlock.Framework.csproj" />
-    <ProjectReference Include="..\..\Tooling\Sherlock.Framework.Modularity.Tools.Vs2017\Sherlock.Framework.Modularity.Tools.Vs2017.csproj" />
     <ProjectReference Include="..\Sherlock.MvcSample.ApiModule\Sherlock.MvcSample.ApiModule.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Sherlock.Framework.Modularity.Tools.Vs2017" Version="2.1.2" />
   </ItemGroup>
 
   <Target Name="Modularity" AfterTargets="AfterPublish">
