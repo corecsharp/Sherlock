@@ -161,14 +161,21 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
 
 组件安装：
 
->WindowsHosting下载地址： https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/DotNetCore.2.0.5-WindowsHosting.exe
 1、安装 DotNetCore.2.0.5-WindowsHosting.exe
-2、执行命令 
+
+2、执行命令： 
+
 net stop was /y
+
 net start w3svc
+
 3、查看IIS中模块是否存在AspNetCoreModule，如果存在即安装成功
+
 4、搭建IIS站点，应用程序池选择 无托管代码，集成
+
 5、也可以使用dotnet .\应用程序名.dll 进行测试
+
+>WindowsHosting下载地址： https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/DotNetCore.2.0.5-WindowsHosting.exe
 ---
 
 
