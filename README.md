@@ -157,7 +157,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
 
 ```
 
-## IIS 部署
+## Windows IIS 部署
 
 组件安装：
 
@@ -178,6 +178,32 @@ net start w3svc
 >WindowsHosting下载地址： https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/DotNetCore.2.0.5-WindowsHosting.exe
 ---
 
+
+#  Centos7及以上 部署
+
+环境准备：
+
+1、sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+2、sudo sh -c 'echo -e "[packages-microsoft-com-prod]\nname=packages-microsoft-com-prod \nbaseurl= https://packages.microsoft.com/yumrepos/microsoft-rhel7.3-prod\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/dotnetdev.repo'
+
+3、sudo yum update
+
+4、sudo yum install libunwind libicu
+
+5、sudo yum install dotnet-sdk-2.1.101
+
+创建监听进程
+
+1、export ASPNETCORE_ENVIRONMENT=testing
+
+2、export ASPNETCORE_URLS=http://*:5001
+
+3、dotent ./应用名.dll（依赖客户端） nohup dotent ./应用名.dll（后台运行）
+
+
+>.NetCore 配置参考地址： https://www.microsoft.com/net/download/linux-package-manager/centos/sdk-2.1.101
+---
 
 
 
