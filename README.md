@@ -199,7 +199,7 @@ net start w3svc
 
 2、export ASPNETCORE_URLS=http://*:5001
 
-3、dotent ./应用名.dll（依赖客户端） nohup dotent ./应用名.dll（后台运行）
+3、dotnet ./应用名.dll（依赖客户端） nohup dotnet ./应用名.dll（后台运行）
 
 
 >.NetCore 配置参考地址： https://www.microsoft.com/net/download/linux-package-manager/centos/sdk-2.1.101
