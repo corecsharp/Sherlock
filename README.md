@@ -137,6 +137,18 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
         }
       ]
     },
+	"Data": {
+      "DefaultConnectionName": "default",
+      "ConnectionStrings": {
+        "default": "server=;Database=;UID=;PWD=;Charset=utf8;SslMode=None;",
+        "dataBase2": "server=;Database=;UID=;PWD=;Charset=utf8;SslMode=None;"
+      },
+	  //表结构映射介绍，参照 Sherlock.Framework.Data.DapperOptions
+      "Dapper": {
+        "IdentifierMappingStrategy": "PascalCase",
+        "CapitalizationRule": "Original"
+      }
+    },
     "Eyes": {
       "Logging": {
         "QueryServiceAddress": "10.66.4.75:19000"
