@@ -31,4 +31,6 @@
     <Exec Command="dotnet modularity --config $(MSBuildProjectFullPath) --dest $(publishUrl)"></Exec>
   </Target>
 
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="https://github.com/corecsharp/Sherlock/blob/master/schemas/appsettings.json" /></VisualStudio></ProjectExtensions>
+
 </Project>
