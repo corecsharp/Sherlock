@@ -13,11 +13,13 @@ namespace Sherlock.Framework.Caching
     public class MemoryCacheManager : ICacheManager, IDisposable
     {
         private ConcurrentDictionary<String, HashSet<String>> _caches = null;
-        public const string DefaultCacheName = "sf.default";
+        //public const string DefaultCacheName = "sf.default";
+        public const string DefaultCacheName = "";
+
         private MemoryCache _cache = null;
 
         internal IMemoryCache InnerCache { get { return _cache; } }
-        
+
 
         public MemoryCacheManager(IOptions<MemoryCacheOptions> options)
             : this(options.Value)
@@ -45,7 +47,9 @@ namespace Sherlock.Framework.Caching
         private string GetFullKey(string region, string key)
         {
             region = region.IfNullOrWhiteSpace(DefaultCacheName);
-            return $"{region}|{key}";
+            if (region.IsNullOrWhiteSpace())
+                return key;
+            return $"{region}:{key}";
         }
 
         private string GetRegionName(string region)
@@ -103,7 +107,7 @@ namespace Sherlock.Framework.Caching
                 }
             }
         }
-        
+
         public void ClearRegion(string region = "")
         {
             this.ValidateRegion(region, nameof(region));
@@ -153,15 +157,15 @@ namespace Sherlock.Framework.Caching
                 this.Remove(key, region);
                 return;
             }
- 
+
             string name = GetRegionName(region);
             string fullKey = this.GetFullKey(name, key);
 
             HashSet<String> regionKeys = _caches.GetOrAdd(name, n => new HashSet<string>());
             regionKeys.Add(fullKey);
-            _cache.Set(fullKey, data, CreateTimeoutOptions(timeout, useSlidingExpiration)) ;
+            _cache.Set(fullKey, data, CreateTimeoutOptions(timeout, useSlidingExpiration));
         }
-        
+
         public void Dispose()
         {
             if (_cache != null)
