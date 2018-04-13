@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>3.0</VersionPrefix>
+    <VersionPrefix>3.0.1</VersionPrefix>
     <ExperimentalProjectVersionPrefix>0.1.0</ExperimentalProjectVersionPrefix>
     <VersionSuffix>rtm</VersionSuffix>
     <PackageVersion Condition="'$(VersionSuffix)' == 'rtm' ">$(VersionPrefix)</PackageVersion>
