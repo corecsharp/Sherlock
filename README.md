@@ -14,6 +14,16 @@
 
 ---
 
+##
+
+**编译框架**   
+
+请下载最新的.net core 2.0sdk ，安装之后查看版本号，修改https://github.com/corecsharp/Sherlock/blob/master/global.json 中sdk的version修改为版本号
+
+---   
+
+##
+
 **关于数据库**   
 
 推荐使用 Dapper 作为数据访问层，框架支持 Dapper，以下是数据库支持情况：   
