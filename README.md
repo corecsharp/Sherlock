@@ -217,5 +217,11 @@ net start w3svc
 >.NetCore 配置参考地址： https://www.microsoft.com/net/download/linux-package-manager/centos/sdk-2.1.101
 ---
 
+## 联系方式
+
+QQ: 280894830
+
+微信：feng_wei_2013
+
 
 
